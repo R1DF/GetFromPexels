@@ -12,7 +12,7 @@ from endpoints import ENDPOINTS
 import requests
 
 # Session class
-class Session:
+class PexelsSession:
     def __init__(self, key: str = None):
         # Initialisation
         self._key = key
