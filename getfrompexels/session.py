@@ -8,6 +8,7 @@ the function set_key().
 # Imports
 from custom_exceptions import PexelsAuthorizationError
 from photo import PexelsPhoto
+from video import PexelsVideo
 from endpoints import ENDPOINTS
 import requests
 
@@ -34,8 +35,8 @@ class PexelsSession:
     # @ensure_valid_key
     def find_photo(self, photo_id):
         if self._key is not None:
-            response = requests.get(ENDPOINTS["FIND_PHOTO"].replace("PHOTO_ID", str(photo_id)),
-                                    headers={"Authorization": self._key})
+            targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
+            response = requests.get(f"{targeted_endpoint}/{photo_id}", headers={"Authorization": self._key})
             if response.status_code != 200:
                 raise PexelsAuthorizationError("invalid API key for authorization")
             self.update_rate_limit_attributes(response)
@@ -43,7 +44,14 @@ class PexelsSession:
         raise PexelsAuthorizationError("API key must be provided for function call")
 
     def find_video(self, video_id):
-        pass
+        if self._key is not None:
+            targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
+            response = requests.get(f"{targeted_endpoint}/{video_id}", headers={"Authorization": self._key})
+            if response.status_code != 200:
+                raise PexelsAuthorizationError("invalid API key for authorization")
+            self.update_rate_limit_attributes(response)
+            return PexelsVideo(response.json())
+        raise PexelsAuthorizationError("API key must be provided for function call")
 
     # Searching functions
     def search_photos(self, query):
