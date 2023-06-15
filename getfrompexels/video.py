@@ -1,5 +1,8 @@
 # Imports
 from user import User
+from video_file import PexelsVideoFile
+from video_picture import PexelsVideoPicture
+
 
 # Video class
 class PexelsVideo:
@@ -15,3 +18,39 @@ class PexelsVideo:
             json_content["user"]["name"],
             json_content["user"]["url"]
         )
+        self._video_files = []  # PexelsVideoArray per element of array
+        self._video_pictures = []  # PexelsVideoPicture per element of array
+
+    # Properties
+    @property
+    def pexels_id(self) -> int:
+        return self._pexels_id
+
+    @property
+    def size(self) -> list[int]:
+        return self._size
+
+    @property
+    def pexels_url(self) -> str:
+        return self._pexels_url
+
+    @property
+    def screenshot_url(self) -> str:
+        return self._screenshot_url
+
+    @property
+    def duration(self) -> int:
+        return self._duration
+
+    @property
+    def owner(self) -> User:
+        return self._owner
+
+    @property
+    def video_files(self) -> list[PexelsVideoFile]:
+        return self._video_files
+
+    @property
+    def video_pictures(self) -> list[PexelsVideoPicture]:
+        return self._video_pictures
+
