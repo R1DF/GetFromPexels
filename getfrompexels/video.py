@@ -7,7 +7,7 @@ from video_picture import PexelsVideoPicture
 # Video class
 class PexelsVideo:
     def __init__(self, json_content):
-        # Initialization of read-only attributes
+        # Initialization of all read-only attributes
         self._pexels_id = json_content["id"]
         self._size = [json_content["width"], json_content["height"]]
         self._pexels_url = json_content["url"]
@@ -18,8 +18,13 @@ class PexelsVideo:
             json_content["user"]["name"],
             json_content["user"]["url"]
         )
+
+        # Initialization continued; creation of lists with child classes
+        video_files = json_content["video_files"]
+        video_pictures = json_content["video_pictures"]
+
         self._video_files = []  # PexelsVideoArray per element of array
-        self._video_pictures = []  # PexelsVideoPicture per element of array
+        self._video_pictures = [PexelsVideoPicture(x["id"], x["picture"]) for x in video_pictures]  # PexelsVideoPicture per element of array
 
     # Properties
     @property
