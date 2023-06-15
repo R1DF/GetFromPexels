@@ -47,6 +47,9 @@ class PexelsSession:
         if self._key is not None:
             targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
             response = requests.get(f"{targeted_endpoint}/{video_id}", headers={"Authorization": self._key})
+
+            # TODO improve request status code checking, such as 401/403 and 429 to differentiate them better
+            #  and also to shorten code length for functions
             if response.status_code != 200:
                 raise PexelsAuthorizationError("invalid API key for authorization")
             self.update_rate_limit_attributes(response)
