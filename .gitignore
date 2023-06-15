@@ -2,3 +2,5 @@
 venv/
 *.xml
 *.iml
+/notes.txt
+test.py
