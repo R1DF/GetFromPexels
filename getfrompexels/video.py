@@ -22,8 +22,7 @@ class PexelsVideo:
         # Initialization continued; creation of lists with child classes
         video_files = json_content["video_files"]
         video_pictures = json_content["video_pictures"]
-
-        self._video_files = []  # PexelsVideoArray per element of array
+        self._video_files = [PexelsVideoFile(x) for x in video_files]  # PexelsVideoArray per element of array
         self._video_pictures = [PexelsVideoPicture(x["id"], x["picture"]) for x in video_pictures]  # PexelsVideoPicture per element of array
 
     # Properties
