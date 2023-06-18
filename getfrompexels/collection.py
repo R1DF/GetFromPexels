@@ -41,3 +41,4 @@ class Collection:
     @property
     def videos_count(self) -> int:
         return self._videos_count
+
