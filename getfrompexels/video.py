@@ -1,7 +1,7 @@
 # Imports
-from user import User
-from video_file import PexelsVideoFile
-from video_picture import PexelsVideoPicture
+from .user import User
+from .video_file import PexelsVideoFile
+from .video_picture import PexelsVideoPicture
 
 
 # Video class

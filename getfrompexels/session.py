@@ -6,11 +6,11 @@ the function set_key().
 """
 
 # Imports
-from custom_exceptions import *
-from photo import PexelsPhoto
-from video import PexelsVideo
-from query_results import PexelsQueryResults
-from endpoints import ENDPOINTS
+from .custom_exceptions import *
+from .photo import PexelsPhoto
+from .video import PexelsVideo
+from .query_results import PexelsQueryResults
+from .endpoints import ENDPOINTS
 import requests
 
 # Session class

@@ -1,5 +1,5 @@
 # Imports
-from user import User
+from .user import User
 
 # Photo class
 class PexelsPhoto:
