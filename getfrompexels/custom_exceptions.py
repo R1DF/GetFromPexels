@@ -13,3 +13,7 @@ class PexelsSearchError(Exception):  # For search functions
 class PexelsLookupError(Exception):  # For find functions
     pass
 
+
+class PexelsAPIRequestError(Exception):  # Will be called when an HTTPS response does not return 200
+    pass
+
