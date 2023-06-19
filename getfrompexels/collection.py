@@ -1,10 +1,9 @@
 # Imports
-from user import User
 from dataclasses import dataclass
 
 # Collection class
 @dataclass
-class Collection:
+class PexelsCollection:
     _pexels_id: int
     _title: str
     _description: str
