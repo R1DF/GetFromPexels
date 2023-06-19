@@ -12,6 +12,7 @@ from .video import PexelsVideo
 from .collection import PexelsCollection
 from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
+from .verifier import verify_response
 import requests
 
 # Session class
@@ -25,72 +26,64 @@ class PexelsSession:
         self._requests_left = None
         self._requests_rollback_timestamp = None
 
-    # Wrapper function to make sure API key is valid
-    # def ensure_valid_key(function):
-    #     def inner_function(self, *args, **kwargs):
-    #         if self._key is None:
-    #             raise PexelsAuthorizationError("API key was not provided")
-    #         return function(self, *args, **kwargs)
-    #     return inner_function
-
-    # Finding functions
-    # @ensure_valid_key
-
     def get_query_parameters(self, **parameters):
         # Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values
         if parameters:
             return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
         return ""
 
+    def get_http_response(self, endpoint):
+        if self._key is None:
+            raise PexelsAuthorizationError("an API key must be provided for function call")
+
+        response = requests.get(endpoint,  headers={"Authorization": self._key})
+        verify_response(response)
+        return response
+
     def find_photo(self, photo_id):
-        if self._key is not None:
-            targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
-            response = requests.get(f"{targeted_endpoint}/{photo_id}", headers={"Authorization": self._key})
-            if response.status_code != 200:
-                raise PexelsAuthorizationError("invalid API key for authorization")
-            self.update_rate_limit_attributes(response)
-            return PexelsPhoto(response.json())
-        raise PexelsAuthorizationError("API key must be provided for function call")
+        # Making request
+        targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
+        request_url = self.get_http_response(f"{targeted_endpoint}/{photo_id}")
+        response = self.get_http_response(request_url).json()
+
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsPhoto(response.json())
 
     def find_video(self, video_id):
-        if self._key is not None:
-            targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-            response = requests.get(f"{targeted_endpoint}/{video_id}", headers={"Authorization": self._key})
+        # Making request
+        targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
+        request_url = self.get_http_response(f"{targeted_endpoint}/{video_id}")
+        response = self.get_http_response(request_url).json()
 
-            # TODO improve request status code checking, such as 401/403 and 429 to differentiate them better
-            #  and also to shorten code length for functions
-            if response.status_code != 200:
-                raise PexelsAuthorizationError("invalid API key for authorization")
-            self.update_rate_limit_attributes(response)
-            return PexelsVideo(response.json())
-        raise PexelsAuthorizationError("API key must be provided for function call")
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsVideo(response.json())
 
     # Search for curated photos/popular videos
     def search_curated_photos(self, *, page=1, per_page=15):
+        # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             return PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
         if page < 1:
             PexelsSearchError("page parameter must be at least 1")
 
-        if self._key is not None:
-            targeted_endpoint = ENDPOINTS["CURATED_PHOTOS"] + self.get_query_parameters(page=page, per_page=per_page)
-            response = requests.get(targeted_endpoint,
-                                    headers={"Authorization": self._key})
-            if response.status_code != 200:
-                raise PexelsAuthorizationError("invalid API key for authorization")
-            self.update_rate_limit_attributes(response)
+        # Making request
+        targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
+        request_url = self.get_http_response(targeted_endpoint + self.get_query_parameters(page=page, per_page=per_page))
+        response = self.get_http_response(request_url).json()
 
-            results = response.json()
-            return PexelsQueryResults(
-                _content=[PexelsPhoto(x) for x in results["photos"]],
-                _url=targeted_endpoint,
-                _total_results=results["total_results"],
-                _page=results["page"],
-                _per_page=results["per_page"]
-            )
-
-        raise PexelsAuthorizationError("API key must be provided for function call")
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        results = response.json()
+        return PexelsQueryResults(
+            _content=[PexelsPhoto(x) for x in results["photos"]],
+            _url=targeted_endpoint,
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
+        )
 
     def search_popular_videos(
             self,
@@ -102,36 +95,35 @@ class PexelsSession:
             page=1,
             per_page=15
     ):
+        # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             return PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
         if page < 1:
             PexelsSearchError("page parameter must be at least 1")
 
-        if self._key is not None:
-            targeted_endpoint = ENDPOINTS["POPULAR+VIDEOS"] + self.get_query_parameters(
-                min_width=min_width,
-                min_height=min_height,
-                min_duration=min_duration,
-                max_duration=max_duration,
-                page=page,
-                per_page=per_page
-            )
-            response = requests.get(targeted_endpoint,
-                                    headers={"Authorization": self._key})
-            if response.status_code != 200:
-                raise PexelsAuthorizationError("invalid API key for authorization")
-            self.update_rate_limit_attributes(response)
+        # Making request
+        targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"]
+        request_url = self.get_http_response(targeted_endpoint + self.get_query_parameters(
+            min_width=min_width,
+            min_height=min_height,
+            min_duration=min_duration,
+            max_duration=max_duration,
+            page=page,
+            per_page=per_page
+        ))
+        response = self.get_http_response(request_url).json()
 
-            results = response.json()
-            return PexelsQueryResults(
-                _content=[PexelsVideo(x) for x in results["videos"]],
-                _url=targeted_endpoint,
-                _total_results=results["total_results"],
-                _page=results["page"],
-                _per_page=results["per_page"]
-            )
-        raise PexelsAuthorizationError("API key must be provided for function call")
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        results = response.json()
+        return PexelsQueryResults(
+            _content=[PexelsVideo(x) for x in results["videos"]],
+            _url=targeted_endpoint,
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
+        )
 
     def search_featured_collections(self, *, page=1, per_page=15):
         if per_page > 80 or per_page < 1:
