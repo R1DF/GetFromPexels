@@ -9,6 +9,7 @@ the function set_key().
 from .custom_exceptions import *
 from .photo import PexelsPhoto
 from .video import PexelsVideo
+from .collection import PexelsCollection
 from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
 import requests
@@ -114,7 +115,7 @@ class PexelsSession:
                 min_duration=min_duration,
                 max_duration=max_duration,
                 page=page,
-                per_page=per_page,
+                per_page=per_page
             )
             response = requests.get(targeted_endpoint,
                                     headers={"Authorization": self._key})
@@ -130,9 +131,44 @@ class PexelsSession:
                 _page=results["page"],
                 _per_page=results["per_page"]
             )
-
         raise PexelsAuthorizationError("API key must be provided for function call")
 
+    def search_featured_collections(self, *, page=1, per_page=15):
+        if per_page > 80 or per_page < 1:
+            return PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
+
+        if page < 1:
+            PexelsSearchError("page parameter must be at least 1")
+
+        if self._key is not None:
+            targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"] + self.get_query_parameters(
+                page=page,
+                per_page=per_page
+            )
+            response = requests.get(targeted_endpoint,
+                                    headers={"Authorization": self._key})
+            if response.status_code != 200:
+                raise PexelsAuthorizationError("invalid API key for authorization")
+            self.update_rate_limit_attributes(response)
+
+            results = response.json()
+            return PexelsQueryResults(
+                _content=[PexelsCollection(
+                    _pexels_id=x["id"],
+                    _title=x["title"],
+                    _description=x["description"],
+                    _is_private=x["private"],
+                    _media_count=x["media_count"],
+                    _photos_count=x["photos_count"],
+                    _videos_count=x["videos_count"]
+
+                ) for x in results["collections"]],
+                _url=targeted_endpoint,
+                _total_results=results["total_results"],
+                _page=results["page"],
+                _per_page=results["per_page"]
+            )
+        raise PexelsAuthorizationError("API key must be provided for function call")
 
     # Search by keyword functions
     def search_photos(self, query):
