@@ -104,15 +104,14 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"]
-        request_url = self.get_http_response(targeted_endpoint + self.get_query_parameters(
+        response = self.get_http_response(targeted_endpoint + self.get_query_parameters(
             min_width=min_width,
             min_height=min_height,
             min_duration=min_duration,
             max_duration=max_duration,
             page=page,
             per_page=per_page
-        ))
-        response = self.get_http_response(request_url).json()
+        )).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -134,12 +133,11 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"] + self.get_query_parameters(
+        request_url = ENDPOINTS["POPULAR_VIDEOS"] + self.get_query_parameters(
             page=page,
             per_page=per_page
         )
-        response = requests.get(targeted_endpoint,
-                                headers={"Authorization": self._key})
+        response = self.get_http_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -155,10 +153,82 @@ class PexelsSession:
                 _videos_count=x["videos_count"]
 
             ) for x in results["collections"]],
-            _url=targeted_endpoint,
+            _url=request_url,
             _total_results=results["total_results"],
             _page=results["page"],
             _per_page=results["per_page"]
+        )
+
+
+    # Search owned collection function
+    def search_user_collections(self, *, page=1, per_page=15):
+        # Checking specific argument validity
+        if per_page > 80 or per_page < 1:
+            raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
+
+        if page < 1:
+            raise PexelsSearchError("page parameter must be at least 1")
+
+        # Making request
+        request_url = ENDPOINTS["USER_COLLECTIONS"] + self.get_query_parameters(
+            page=page,
+            per_page=per_page
+        )
+        response = self.get_http_response(request_url).json()
+
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsQueryResults(
+            _content=[PexelsCollection(
+                _pexels_id=x["id"],
+                _title=x["title"],
+                _description=x["description"],
+                _is_private=x["private"],
+                _media_count=x["media_count"],
+                _photos_count=x["photos_count"],
+                _videos_count=x["videos_count"]
+
+            ) for x in response["collections"]],
+            _url=request_url,
+            _total_results=response["total_results"],
+            _page=response["page"],
+            _per_page=response["per_page"]
+        )
+
+    # Search media in collection
+    def search_collection_contents(
+            self,
+            *,
+            collection_id: int,
+            media_type: str = None,
+            page: int = 1,
+            per_page: int = 15
+    ):
+        # Checking specific argument validity
+        if media_type not in ["photo", "video"]:
+            media_type = None  # Done to remove from parameters section in request URL
+
+        if per_page > 80 or per_page < 1:
+            raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
+
+        if page < 1:
+            raise PexelsSearchError("page parameter must be at least 1")
+
+        # Making request
+        request_url = f"{ENDPOINTS['COLLECTION_MEDIA']}/{collection_id}" + self.get_query_parameters(
+            page=page,
+            per_page=per_page
+        )
+        response = self.get_http_response(request_url).json()
+
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsQueryResults(
+            _content=response["media"],
+            _url=request_url,
+            _total_results=response["total_results"],
+            _page=response["page"],
+            _per_page=response["per_page"]
         )
 
 
