@@ -10,6 +10,7 @@ class PexelsQueryResults:
     _page: int
     _per_page: int
 
+
     # Properties
     @property
     def content(self) -> list:
