@@ -14,6 +14,52 @@ from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
 from .verifier import verify_response
 import requests
+import re
+
+# Constants
+SUPPORTED_PHOTO_COLORS = (
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "turquoise",
+    "blue",
+    "violet",
+    "pink",
+    "brown",
+    "black",
+    "gray",
+    "white"
+)
+
+SUPPORTED_LOCATIONS = (
+    "en-US",
+    "pt-BR",
+    "es-ES",
+    "it-it",
+    "fr-FR",
+    "sv-SE",
+    "id-ID",
+    "pl=PL",
+    "ja-JP",
+    "zh-TW",
+    "zh-CN",
+    "ko-KR",
+    "th-TH",
+    "nl-NL",
+    "hu-HU",
+    "vi-VN",
+    "cs-CZ",
+    "da-DK",
+    "fi-FI",
+    "uk-UA",
+    "el-GR",
+    "ro-RO",
+    "nb-NO",
+    "sk-SK",
+    "tr-TR",
+    "ru-RU"
+)
 
 # Session class
 class PexelsSession:
@@ -25,6 +71,26 @@ class PexelsSession:
         self._request_limit = None
         self._requests_left = None
         self._requests_rollback_timestamp = None
+
+    # Functions to shorten code
+    def _check_query_arguments(self, query, orientation, size, color, locale):
+        if not query:
+            raise PexelsSearchError("query parameter must be entered")
+
+        if (orientation is not None) and (orientation not in ["landscape", "portrait", "square"]):
+            raise PexelsSearchError("unsupported or invalid orientation parameter, must either not be set or "
+                                    "landscape, portrait or square")
+
+        if (size is not None) and (size not in ["small", "medium", "large"]):
+            raise PexelsSearchError("unsupported or invalid size parameter, must either not be set or small, "
+                                    "medium or large")
+
+        if (color is not None) and (color not in SUPPORTED_PHOTO_COLORS) and \
+                (not re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)):  # Thanks to teoreda StackOverflow for hex col detection
+            raise PexelsSearchError("unsupported or invalid color parameter")
+
+        if (locale is not None) and (locale not in SUPPORTED_LOCATIONS):
+            raise PexelsSearchError("unsupported or invalid locale parameter")
 
     def get_query_parameters(self, **parameters):
         # Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values
@@ -71,7 +137,8 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-        request_url = self.get_http_response(targeted_endpoint + self.get_query_parameters(page=page, per_page=per_page))
+        request_url = self.get_http_response(
+            targeted_endpoint + self.get_query_parameters(page=page, per_page=per_page))
         response = self.get_http_response(request_url).json()
 
         # Returning data and updating rate limit values
@@ -159,7 +226,6 @@ class PexelsSession:
             _per_page=results["per_page"]
         )
 
-
     # Search owned collection function
     def search_user_collections(self, *, page=1, per_page=15):
         # Checking specific argument validity
@@ -217,7 +283,8 @@ class PexelsSession:
         # Making request
         request_url = f"{ENDPOINTS['COLLECTION_MEDIA']}/{collection_id}" + self.get_query_parameters(
             page=page,
-            per_page=per_page
+            per_page=per_page,
+            type=media_type
         )
         response = self.get_http_response(request_url).json()
 
@@ -231,13 +298,86 @@ class PexelsSession:
             _per_page=response["per_page"]
         )
 
-
     # Search by keyword functions
-    def search_photos(self, query):
-        pass
+    def search_photos(
+            self,
+            query,
+            orientation=None,
+            size=None,
+            color=None,
+            locale=None,
+            page=1,
+            per_page=15
+    ):
+        # Checking argument validity
+        query = query.strip()
+        self._check_query_arguments(query, orientation, size, color, locale)
+        if per_page > 80 or per_page < 1:
+            raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
-    def search_videos(self, query):
-        pass
+        if page < 1:
+            raise PexelsSearchError("page parameter must be at least 1")
+
+        # Making request
+        request_url = ENDPOINTS["SEARCH_PHOTOS"] + self.get_query_parameters(
+            query=query,
+            orientation=orientation,
+            size=size,
+            color=color,
+            locale=locale,
+            page=page,
+            per_page=per_page
+        )
+        response = self.get_http_response(request_url).json()
+
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsQueryResults(
+            _content=[PexelsPhoto(x) for x in response["photos"]],
+            _url=request_url,
+            _total_results=response["total_results"],
+            _page=response["page"],
+            _per_page=response["per_page"]
+        )
+
+    def search_videos(
+            self,
+            query,
+            orientation=None,
+            size=None,
+            locale=None,
+            page=1,
+            per_page=15
+    ):
+        # Checking argument validity
+        query = query.strip()
+        self._check_query_arguments(query, orientation, size, None, locale)
+        if per_page > 80 or per_page < 1:
+            raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
+
+        if page < 1:
+            raise PexelsSearchError("page parameter must be at least 1")
+
+        # Making request
+        request_url = ENDPOINTS["SEARCH_VIDEOS"] + self.get_query_parameters(
+            query=query,
+            orientation=orientation,
+            size=size,
+            locale=locale,
+            page=page,
+            per_page=per_page
+        )
+        response = self.get_http_response(request_url).json()
+
+        # Returning data and updating rate limit values
+        self.update_rate_limit_attributes(response)
+        return PexelsQueryResults(
+            _content=[PexelsVideo(x) for x in response["photos"]],
+            _url=request_url,
+            _total_results=response["total_results"],
+            _page=response["page"],
+            _per_page=response["per_page"]
+        )
 
     # Key setting function
     def set_key(self, key: str):
