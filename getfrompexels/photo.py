@@ -1,5 +1,7 @@
 # Imports
 from .user import User
+import requests
+
 
 # Photo class
 class PexelsPhoto:
@@ -26,6 +28,12 @@ class PexelsPhoto:
         }
         self._liked_by_user = json_content["liked"]
         self._alt_text = json_content["alt"]
+
+    # Methods
+    def download(self, path, size="original"):   # Path includes file name
+        image_content = requests.get(self.links[size])
+        with open(f"{path}.jpg", "wb") as file:
+            file.write(image_content.content)  # .mp4 for videos
 
     # Properties
     @property
