@@ -16,6 +16,12 @@ from .verifier import verify_response
 import requests
 import re
 
+
+# Non-class function
+def ensure_lower(*values):
+    return list(map(lambda x: x.lower() if isinstance(x, str) else x, values))
+
+
 # Constants
 SUPPORTED_PHOTO_COLORS = (
     "red",
@@ -74,6 +80,8 @@ class PexelsSession:
 
     # Functions to shorten code
     def _check_query_arguments(self, query, orientation, size, color, locale):
+        orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
+
         if not query:
             raise PexelsSearchError("query parameter must be entered")
 
@@ -98,7 +106,7 @@ class PexelsSession:
             return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
         return ""
 
-    def get_http_response(self, endpoint):
+    def get_https_response(self, endpoint):
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
 
@@ -109,8 +117,8 @@ class PexelsSession:
     def find_photo(self, photo_id):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
-        request_url = self.get_http_response(f"{targeted_endpoint}/{photo_id}")
-        response = self.get_http_response(request_url).json()
+        request_url = self.get_https_response(f"{targeted_endpoint}/{photo_id}")
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -119,15 +127,15 @@ class PexelsSession:
     def find_video(self, video_id):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-        request_url = self.get_http_response(f"{targeted_endpoint}/{video_id}")
-        response = self.get_http_response(request_url).json()
+        request_url = self.get_https_response(f"{targeted_endpoint}/{video_id}")
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsVideo(response.json())
 
     # Search for curated photos/popular videos
-    def search_curated_photos(self, *, page=1, per_page=15):
+    def search_curated_photos(self, page=1, per_page=15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -137,9 +145,9 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-        request_url = self.get_http_response(
+        request_url = self.get_https_response(
             targeted_endpoint + self.get_query_parameters(page=page, per_page=per_page))
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -154,7 +162,6 @@ class PexelsSession:
 
     def search_popular_videos(
             self,
-            *,
             min_width=None,
             min_height=None,
             min_duration=None,
@@ -171,7 +178,7 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"]
-        response = self.get_http_response(targeted_endpoint + self.get_query_parameters(
+        response = self.get_https_response(targeted_endpoint + self.get_query_parameters(
             min_width=min_width,
             min_height=min_height,
             min_duration=min_duration,
@@ -191,7 +198,7 @@ class PexelsSession:
             _per_page=results["per_page"]
         )
 
-    def search_featured_collections(self, *, page=1, per_page=15):
+    def search_featured_collections(self, page=1, per_page=15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -204,7 +211,7 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -227,7 +234,7 @@ class PexelsSession:
         )
 
     # Search owned collection function
-    def search_user_collections(self, *, page=1, per_page=15):
+    def search_user_collections(self, page=1, per_page=15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -240,7 +247,7 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -264,7 +271,6 @@ class PexelsSession:
     # Search media in collection
     def search_collection_contents(
             self,
-            *,
             collection_id: int,
             media_type: str = None,
             page: int = 1,
@@ -286,7 +292,7 @@ class PexelsSession:
             per_page=per_page,
             type=media_type
         )
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -328,7 +334,7 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -351,7 +357,7 @@ class PexelsSession:
     ):
         # Checking argument validity
         query = query.strip()
-        self._check_query_arguments(query, orientation, size, None, locale)
+        self._check_query_arguments(query, orientation, size, None, locale)  # No such parameter as color for video
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
@@ -367,7 +373,7 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_http_response(request_url).json()
+        response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
