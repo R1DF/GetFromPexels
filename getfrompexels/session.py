@@ -118,7 +118,7 @@ class PexelsSession:
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
         request_url = f"{targeted_endpoint}/{photo_id}"
-        response = self.get_https_response(request_url, "find").json()
+        response = self.get_https_response(request_url, "find")
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -128,7 +128,7 @@ class PexelsSession:
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
         request_url = f"{targeted_endpoint}/{video_id}"
-        response = self.get_https_response(request_url, "find").json()
+        response = self.get_https_response(request_url, "find")
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -212,10 +212,10 @@ class PexelsSession:
             per_page=per_page
         )
         response = self.get_https_response(request_url).json()
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
-        results = response.json()
         return PexelsQueryResults(
             _content=[PexelsCollection(
                 _pexels_id=x["id"],
@@ -247,7 +247,8 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url)
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -261,11 +262,11 @@ class PexelsSession:
                 _photos_count=x["photos_count"],
                 _videos_count=x["videos_count"]
 
-            ) for x in response["collections"]],
+            ) for x in results["collections"]],
             _url=request_url,
-            _total_results=response["total_results"],
-            _page=response["page"],
-            _per_page=response["per_page"]
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
         )
 
     # Search media in collection
@@ -292,16 +293,17 @@ class PexelsSession:
             per_page=per_page,
             type=media_type
         )
-        response = self.get_https_response(request_url, "find").json()   # 404 counts as PexelsLookupError here
+        response = self.get_https_response(request_url, "find")  # 404 counts as PexelsLookupError here
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
-            _content=response["media"],
+            _content=results["media"],
             _url=request_url,
-            _total_results=response["total_results"],
-            _page=response["page"],
-            _per_page=response["per_page"]
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
         )
 
     # Search by keyword functions
@@ -334,16 +336,17 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url)
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
-            _content=[PexelsPhoto(x) for x in response["photos"]],
+            _content=[PexelsPhoto(x) for x in results["photos"]],
             _url=request_url,
-            _total_results=response["total_results"],
-            _page=response["page"],
-            _per_page=response["per_page"]
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
         )
 
     def search_for_videos(
@@ -373,16 +376,17 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url)
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
-            _content=[PexelsVideo(x) for x in response["photos"]],
+            _content=[PexelsVideo(x) for x in results["videos"]],
             _url=request_url,
-            _total_results=response["total_results"],
-            _page=response["page"],
-            _per_page=response["per_page"]
+            _total_results=results["total_results"],
+            _page=results["page"],
+            _per_page=results["per_page"]
         )
 
     # Key setting function
