@@ -106,19 +106,19 @@ class PexelsSession:
             return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
         return ""
 
-    def get_https_response(self, endpoint):
+    def get_https_response(self, endpoint, origin_function_type=None):
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
 
         response = requests.get(endpoint, headers={"Authorization": self._key})
-        verify_response(response)
+        verify_response(response, origin_function_type)
         return response
 
     def find_photo(self, photo_id):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
-        request_url = self.get_https_response(f"{targeted_endpoint}/{photo_id}")
-        response = self.get_https_response(request_url).json()
+        request_url = f"{targeted_endpoint}/{photo_id}"
+        response = self.get_https_response(request_url, "find").json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -127,8 +127,8 @@ class PexelsSession:
     def find_video(self, video_id):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-        request_url = self.get_https_response(f"{targeted_endpoint}/{video_id}")
-        response = self.get_https_response(request_url).json()
+        request_url = f"{targeted_endpoint}/{video_id}"
+        response = self.get_https_response(request_url, "find").json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -269,7 +269,7 @@ class PexelsSession:
         )
 
     # Search media in collection
-    def search_collection_contents(
+    def find_collection_contents(
             self,
             collection_id: int,
             media_type: str = None,
@@ -292,7 +292,7 @@ class PexelsSession:
             per_page=per_page,
             type=media_type
         )
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url, "find").json()   # 404 counts as PexelsLookupError here
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
@@ -305,7 +305,7 @@ class PexelsSession:
         )
 
     # Search by keyword functions
-    def search_photos(
+    def search_for_photos(
             self,
             query,
             orientation=None,
@@ -346,7 +346,7 @@ class PexelsSession:
             _per_page=response["per_page"]
         )
 
-    def search_videos(
+    def search_for_videos(
             self,
             query,
             orientation=None,
