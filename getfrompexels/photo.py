@@ -33,7 +33,7 @@ class PexelsPhoto:
     def download(self, path, size="original"):   # Path includes file name
         image_content = requests.get(self.links[size])
         with open(f"{path}.jpg", "wb") as file:
-            file.write(image_content.content)  # .mp4 for videos
+            file.write(image_content.content)
 
     # Properties
     @property
