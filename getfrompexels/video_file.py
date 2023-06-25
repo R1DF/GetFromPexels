@@ -1,3 +1,7 @@
+# Imports
+import requests
+
+
 # Photo class
 class PexelsVideoFile:
     def __init__(self, json_content):
@@ -8,6 +12,12 @@ class PexelsVideoFile:
         self._size = [json_content["width"], json_content["height"]]
         self._fps = json_content["fps"]
         self._url = json_content["link"]
+
+    # Methods
+    def download(self, path):  # Path includes file name
+        video_content = requests.get(self.url)
+        with open(f"{path}.mp4", "wb") as file:
+            file.write(video_content.content)
 
     # Properties
     @property
