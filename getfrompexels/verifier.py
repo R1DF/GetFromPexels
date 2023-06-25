@@ -1,8 +1,8 @@
 # Getting exceptions
-from .custom_exceptions import PexelsAuthorizationError, PexelsAPIRequestError
+from .custom_exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
 
 # Response verifier (called by PexelsSession before returning anything)
-def verify_response(response):
+def verify_response(response, origin_function_type=None):
     status_code = response.status_code
 
     # Making sure the response is valid first
@@ -19,10 +19,12 @@ def verify_response(response):
             message = "response returned HTTP 403 \"Forbidden\" status code"
 
         case 404:
+            if origin_function_type == "find":
+                raise PexelsLookupError("no media found; invalid ID")
             message = "response returned HTTP 404 \"Not Found\" status code"
 
         case 429:
-            message = "response returned HTTP 429 \"Too Many Requests\" status code"
+            message = "response returned HTTP 429 \"Too Many Requests\" status code, please wait longer"
 
     if 500 <= response.status_code <= 599:
         raise PexelsAPIRequestError(f"response returned HTTP {status_code}, this is a server error")
