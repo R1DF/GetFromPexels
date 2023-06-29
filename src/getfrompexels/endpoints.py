@@ -5,7 +5,7 @@ ENDPOINTS = {
     "POPULAR_VIDEOS": "https://api.pexels.com/videos/popular",
     "FEATURED_COLLECTIONS": "https://api.pexels.com/v1/collections/featured",
     "USER_COLLECTIONS": "https://api.pexels.com/v1/collections",
-    "COLLECTION_MEDIA": "https://api.pexels.com/v1/collections",  # Same as USER_COLLECTIONS but kept separate just in case
+    "COLLECTION_MEDIA": "https://api.pexels.com/v1/collections",
     "SEARCH_PHOTOS": "https://api.pexels.com/v1/search",
     "SEARCH_VIDEOS": "https://api.pexels.com/videos/search"
 }
