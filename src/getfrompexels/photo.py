@@ -1,5 +1,5 @@
 # Imports
-from .user import User
+from .user import PexelsUser
 import requests
 
 
@@ -11,7 +11,7 @@ class PexelsPhoto:
         self._size = [json_content["width"], json_content["height"]]
         self._pexels_url = json_content["url"]
         self._average_color = json_content["avg_color"]
-        self._photographer = User(
+        self._photographer = PexelsUser(
             json_content["photographer"],
             json_content["photographer_url"],
             json_content["photographer_id"]
@@ -53,7 +53,7 @@ class PexelsPhoto:
         return self._average_color
 
     @property
-    def photographer(self) -> User:
+    def photographer(self) -> PexelsUser:
         return self._photographer
 
     @property

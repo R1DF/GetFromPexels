@@ -1,5 +1,5 @@
 # Imports
-from .user import User
+from .user import PexelsUser
 from .video_file import PexelsVideoFile
 from .video_picture import PexelsVideoPicture
 
@@ -13,7 +13,7 @@ class PexelsVideo:
         self._pexels_url = json_content["url"]
         self._screenshot_url = json_content["image"]
         self._duration = json_content["duration"]
-        self._owner = User(
+        self._owner = PexelsUser(
             json_content["user"]["id"],
             json_content["user"]["name"],
             json_content["user"]["url"]
@@ -47,7 +47,7 @@ class PexelsVideo:
         return self._duration
 
     @property
-    def owner(self) -> User:
+    def owner(self) -> PexelsUser:
         return self._owner
 
     @property
