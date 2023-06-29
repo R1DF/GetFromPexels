@@ -1,3 +1,9 @@
+"""This Python module contains the PexelsPhoto class that holds information about a photo stored on Pexels.
+
+Classes:
+    PexelsPhoto: Class that contains information about a photo hosted on Pexels.
+"""
+
 # Imports
 from .user import PexelsUser
 import requests
@@ -5,7 +11,30 @@ import requests
 
 # Photo class
 class PexelsPhoto:
-    def __init__(self, json_content):
+    """Class that contains information about a photo hosted on Pexels.
+
+    Attributes:
+        pexels_id: The ID of the photo.
+        size: A list containing the width and height of the photo in pixels.
+        pexels_url: The URL to the photo on Pexels.
+        average_color: The hex code of the average color of the photo.
+        photographer: PexelsUser object that contains information about the photographer.
+        links: A dictionary containing direct links to the image in varying sizes.
+        liked_by_user: Boolean variable that shows whether the user has liked the image or not.
+        alt_text: Alt text for the image.
+
+    Methods:
+        download(self, path, size="original")
+        Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they wish.
+    """
+
+    def __init__(self, json_content: dict):
+        """Constructor of the class.
+
+        Args:
+            json_content: A dictionary containing data about the photo from a successful API request.
+        """
+
         # Initialization of read-only attributes
         self._pexels_id = json_content["id"]
         self._size = [json_content["width"], json_content["height"]]
@@ -30,7 +59,16 @@ class PexelsPhoto:
         self._alt_text = json_content["alt"]
 
     # Methods
-    def download(self, path, size="original"):   # Path includes file name
+    def download(self, path: str, size: str = "original"):   # Path includes file name.
+        """Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they
+        wish.
+
+        Args:
+            path: The path and the filename of the file that the photo will be saved as. The .JPG extension will be
+            added by default.
+            size: The size of the photo that will be saved from the "links" property. Default is "original".
+        """
+
         image_content = requests.get(self.links[size])
         with open(f"{path}.jpg", "wb") as file:
             file.write(image_content.content)
@@ -38,32 +76,40 @@ class PexelsPhoto:
     # Properties
     @property
     def pexels_id(self) -> int:
+        """The ID of the photo."""
         return self._pexels_id
 
     @property
     def size(self) -> list[int]:
+        """A list containing the width and height of the photo in pixels."""
         return self._size
 
     @property
     def pexels_url(self) -> str:
+        """The URL to the photo on Pexels."""
         return self._pexels_url
 
     @property
     def average_color(self) -> str:
+        """The hex code of the average color of the photo."""
         return self._average_color
 
     @property
     def photographer(self) -> PexelsUser:
+        """PexelsUser object that contains information about the photographer."""
         return self._photographer
 
     @property
     def links(self) -> dict:
+        """A dictionary containing direct links to the image in varying sizes."""
         return self._links
 
     @property
     def liked_by_user(self) -> bool:
+        """Boolean variable that shows whether the user has liked the image or not."""
         return self._liked_by_user
 
     @property
     def alt_text(self) -> str:
+        """Alt text for the image."""
         return self._alt_text
