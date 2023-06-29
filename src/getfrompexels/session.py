@@ -111,7 +111,6 @@ class PexelsSession:
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
-
     def get_https_response(self, endpoint: str, origin_function_type: str | None = None):
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
@@ -421,3 +420,4 @@ class PexelsSession:
     @property
     def requests_rollback_timestamp(self):
         return self._requests_rollback_timestamp
+
