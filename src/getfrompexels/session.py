@@ -113,9 +113,69 @@ def get_query_parameters(**parameters):
 
 # Session class
 class PexelsSession:
+    """The main class that is used to call functions which deal with making requests to the Pexels API.
+
+    Attributes:
+        key: The API key used every time a request is made.
+        request_limit: The maximum amount of requests the user can make for the month.
+        requests_left: The amount of requests the user can make for until the limit resets.
+        requests_rollback_timestamp: The UNIX timestamp of the date when the monthly period rolls over.
+
+    Methods:
+        get_http_response(self, endpoint: str, origin_function_type: str | None = None) -> requests.Response
+        Returns a requests.Response object provided an endpoint.
+
+        find_photo(self, photo_id: int) -> PexelsPhoto
+        Returns a PexelsPhoto object depending on the given photo ID.
+
+        find_video(self, video_id: int) -> PexelsVideo
+        Returns a PexelsVideo object depending on the given video ID.
+
+        search_curated_photos(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        Returns a PexelsQueryResults object containing photos curated by the Pexels team.
+
+        search_popular_videos(self, min_width: int | None = None, min_height: int | None = None,
+        min_duration: int | None = None, max_duration: int | None = None, page: int = 1, per_page: int = 15) ->
+        PexelsQueryResults
+        Returns a PexelsQueryResults object containing popular videos.
+
+        search_featured_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        Returns PexelsQueryResults object containing featured collections.
+
+        search_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        Returns PexelsQueryResults object containing collections that the user has.
+
+        find_collection_contents(self, collection_id: int, media_type: str | None = None, page: int = 1,
+        per_page: int = 15) -> PexelsQueryResults
+        Returns a PexelsQueryResults object containing media inside a collection given by ID.
+
+        search_for_photos(self, query: str, orientation: str | None = None, size: str | None = None,
+        color: str | None = None, locale: str | None = None, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        Searches and returns a PexelsQueryResults object containing photos given by a query.
+
+        search_for_videos(self, query: str, orientation: str | None = None, size: str | None = None,
+        locale: str | None = None, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        Searches and returns a PexelsQueryResults object containing videos given by a query.
+
+        set_key(self, key: str)
+        Sets the key of the PexelsSession object or changes it if an old one is present.
+
+        update_rate_limit_attributes(self, response: requests.Response)
+        Updates the request limit attributes given by the latest response's headers. This function gets called by
+        another method.
+    """
+
     def __init__(self, key: str = None):
+        """
+        Constructor of the PexelsSession object.
+
+        Args:
+            key: The API key used. Can be left optional and set later but the object will be useless without it.
+        """
         # TODO add docstring for class itself and at the top of the file, then proceed to other files
         # Initialisation
+        if not (isinstance(key, str) or key is None):
+            raise TypeError("key must either be not given/None or a str object")
         self._key = key
 
         # The values below can only be seen after the first successful request is made. At first, they are set to None.
@@ -124,8 +184,9 @@ class PexelsSession:
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
-    def get_https_response(self, endpoint: str, origin_function_type: str | None = None):
-        """Serves as the main function that makes an HTTPS request to the Pexels API.
+    def get_https_response(self, endpoint: str, origin_function_type: str | None = None) -> requests.Response:
+        """Serves as the main function that makes an HTTPS request to the Pexels API. Returns a requests.Response
+        object.
 
         Args:
             endpoint: HTTPS endpoint to be called.
@@ -143,7 +204,7 @@ class PexelsSession:
         return response
 
     # API wrapper functions
-    def find_photo(self, photo_id: int):
+    def find_photo(self, photo_id: int) -> PexelsPhoto:
         """Returns a PexelsPhoto object given the photo ID.
 
         Args:
@@ -159,7 +220,7 @@ class PexelsSession:
         self.update_rate_limit_attributes(response)
         return PexelsPhoto(response.json())
 
-    def find_video(self, video_id: int):
+    def find_video(self, video_id: int) -> PexelsVideo:
         """Returns a PexelsVideo object given the video ID.
 
         Args:
@@ -176,13 +237,12 @@ class PexelsSession:
         return PexelsVideo(response.json())
 
     # Search for curated photos/popular videos
-    def search_curated_photos(self, page: int = 1, per_page: int = 15):
-        """Returns a PexelsQueryResults object containing photos curated by the Pexels team given the searched page and
-        amount of photos to feature in the page.
+    def search_curated_photos(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
+        """Returns a PexelsQueryResults object containing photos curated by the Pexels team.
 
         Args:
-            page: The page number that is being requested. Default is 1.
-            per_page: The number of results that is being requested for the page. Default is 15, maximum is 80.
+            page: The results page number that is being requested. Default is 1.
+            per_page: The number of photos that is being requested for the page. Default is 15, maximum is 80.
 
         Raises:
             PexelsSearchError: When page is less than 1 or per_page is out of the 1 <= per_page <= 80 range.
@@ -219,16 +279,16 @@ class PexelsSession:
             max_duration: int | None = None,
             page: int = 1,
             per_page: int = 15
-    ):
-        """Returns a PexelsQueryResults object containing popular Pexels videos with several parameters.
+    ) -> PexelsQueryResults:
+        """Returns a PexelsQueryResults object containing popular Pexels videos with optional parameters.
 
         Args:
             min_width: The minimum width in pixels of the returned videos. Optional.
             min_height: The minimum height in pixels of the returned videos. Optional.
             min_duration: The minimum duration of the returned videos in seconds. Optional.
             max_duration: The maximum duration of the returned videos in seconds. Optional.
-            page: The page number that is being requested. Default is 1.
-            per_page: The number of results that is being requested for the page. Default is 15, maximum is 80.
+            page: The results page number that is being requested. Default is 1.
+            per_page: The number of videos that is being requested for the page. Default is 15, maximum is 80.
 
         Raises:
             PexelsSearchError: When specific criteria aren't met, such as max_duration being less than min_duration,
@@ -271,7 +331,18 @@ class PexelsSession:
             _per_page=results["per_page"]
         )
 
-    def search_featured_collections(self, page: int = 1, per_page: int = 15):
+    def search_featured_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
+        """Returns a PexelsQueryResults object containing featured Pexels collections.
+
+        Args:
+            page: The results page number that is being requested. Default is 1.
+            per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
+
+        Raises:
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
+            per_page <= 80 range.
+        """
+
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -307,7 +378,18 @@ class PexelsSession:
         )
 
     # Search owned collection function
-    def search_user_collections(self, page: int = 1, per_page: int = 15):
+    def search_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
+        """Returns a PexelsQueryResults object containing the collections saved by the user.
+
+        Args:
+            page: The results page number that is being requested.
+            per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
+
+        Raises:
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
+            per_page <= 80 range.
+        """
+
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -349,7 +431,22 @@ class PexelsSession:
             media_type: str | None = None,
             page: int = 1,
             per_page: int = 15
-    ):
+    ) -> PexelsQueryResults:
+        """Returns a PexelsQueryResults object that contains media that is part of a given collection. The
+        media type can be filtered out.
+
+        Args:
+            collection_id: The ID of the collection the contents of which are being requested.
+            media_type: The specific type of media that is being requested, either "photo" or "video". Optional,
+            if not provided or an invalid value is given then the media will not be filtered at all.
+            page: The results page number that is being requested.
+            per_page: Amount of media that will be returned in the page. Default is 15. Maximum is 80.
+
+        Raises:
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
+            per_page <= 80 range.
+        """
+
         # Checking specific argument validity
         if media_type not in ["photo", "video"]:
             media_type = None  # Done to remove from parameters section in request URL
@@ -366,7 +463,7 @@ class PexelsSession:
             per_page=per_page,
             type=media_type
         )
-        response = self.get_https_response(request_url, "find")  # 404 counts as PexelsLookupError here
+        response = self.get_https_response(request_url, "find")  # 404 counts as PexelsLookupError in verify_response()
         results = response.json()
 
         # Returning data and updating rate limit values
@@ -389,7 +486,28 @@ class PexelsSession:
             locale: str | None = None,
             page: int = 1,
             per_page: int = 15
-    ):
+    ) -> PexelsQueryResults:
+        """Searches for photos given a specific query and some optional parameters and returns a PexelsQueryResults
+        object with the photos that are returned.
+
+        Args:
+             query: The query that is being searched.
+             orientation: The selected orientation of the photos. Either "landscape", "portrait", or "square". Optional,
+             if it's not given then photos of any orientation will show up.
+             size: The chosen size of the photos. Either "large" (24MP), "medium" (12MP), or "small" (4MP). Optional,
+             if it's not given then photos of any size will show up.
+             color: Desired color of the photo. Can either be a hex value or part of SUPPORTED_PHOTO_COLORS. Optional,
+             if it's not given the photos of any color will show up.
+             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not
+             given then photos regardless of locale will show up.
+             page: The results page number that is being requested.
+             per_page: Amount of photos that will be returned in the page. Default is 15. Maximum is 80.
+
+        Raises:
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
+            per_page <= 80 range.
+        """
+
         # Checking argument validity
         query = query.strip()
         check_query_arguments(query, orientation, size, color, locale)
@@ -430,7 +548,26 @@ class PexelsSession:
             locale: str | None = None,
             page=1,
             per_page=15
-    ):
+    ) -> PexelsQueryResults:
+        """Searches for videos given a specific query and some optional parameters and returns a PexelsQueryResults
+        object with the videos that are returned.
+
+        Args:
+             query: The query that is being searched.
+             orientation: The selected orientation of the videos. Either "landscape", "portrait", or "square". Optional,
+             if it's not given then videos of any orientation will show up.
+             size: The chosen size of the videos. Either "large" (4K), "medium" (Full HD), or "small" (HD). Optional,
+             if it's not given then videos of any size will show up.
+             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not
+             given then videos regardless of locale will show up.
+             page: The results page number that is being requested.
+             per_page: Amount of videos that will be returned in the page. Default is 15. Maximum is 80.
+
+        Raises:
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
+            per_page <= 80 range.
+        """
+
         # Checking argument validity
         query = query.strip()
         check_query_arguments(query, orientation, size, None, locale)  # No such parameter as color for video
@@ -464,27 +601,49 @@ class PexelsSession:
 
     # Key setting function
     def set_key(self, key: str):
+        """Sets the key of the PexelsSession object or changes it if an old one is present.
+
+        Args:
+            key: The new key.
+
+        Raises:
+            TypeError: When the key argument is not a str object.
+        """
+
+        if not isinstance(key, str):
+            raise TypeError("key is not a string object")
         self._key = key
 
     # Updating saved rate limit values
-    def update_rate_limit_attributes(self, response):
+    def update_rate_limit_attributes(self, response: requests.Response):
+        """Updates the request limit attributes given by the latest response's headers. This function gets called by
+        another method.
+
+        Args:
+            response: The requests.Response object the headers of which will contain the latest request statistics.
+        """
+
         self._request_limit = response.headers["X-Ratelimit-Limit"]
         self._requests_left = response.headers["X-Ratelimit-Remaining"]
         self._requests_rollback_timestamp = response.headers["X-Ratelimit-Reset"]
 
     # Properties
     @property
-    def key(self):
+    def key(self) -> str:
+        """The API key for the PexelsSession object."""
         return self._key
 
     @property
-    def request_limit(self):
+    def request_limit(self) -> int:
+        """The maximum amount of requests the user can make for the month."""
         return self._request_limit
 
     @property
-    def requests_left(self):
+    def requests_left(self) -> int:
+        """The amount of requests the user can make for until the limit resets."""
         return self._requests_left
 
     @property
-    def requests_rollback_timestamp(self):
+    def requests_rollback_timestamp(self) -> int:
+        """The UNIX timestamp of the date when the monthly period rolls over."""
         return self._requests_rollback_timestamp
