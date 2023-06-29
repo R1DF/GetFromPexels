@@ -1,5 +1,4 @@
-"""
-Python module that contains the PexelsSession class and associated variables and functions.
+"""Python module that contains the PexelsSession class and associated variables and functions.
 
 Classes:
     PexelsSession: The main class that is used to communicate with the Pexels API.
