@@ -1,8 +1,23 @@
 """
-PexelsSession class
-This is the main class that should be used to get content from the service Pexels.
-The API key can be passed as an argument either when a class instance is defined, or set later with
-the function set_key().
+Python module that contains the PexelsSession class and associated variables and functions.
+
+Classes:
+    PexelsSession: The main class that is used to communicate with the Pexels API.
+
+Functions:
+    ensure_lower(*values)
+    Returns a modified list of given values (*values) where all string members are in lowercase.
+
+    check_query_arguments(query, orientation, size, color, locale)
+    Checks and raises exceptions when arguments passed in a "search" function do not fit required criteria. This
+    function is called inside another method. More information on the arguments can be seen in those functions.
+
+    get_query_parameters(**parameters)
+    Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values.
+
+Variables:
+    SUPPORTED_PHOTO_COLORS: Tuple containing supported colors for Pexels photos.
+    SUPPORTED_LOCATIONS: Tuple containing supported locale values for Pexels photos and videos.
 """
 
 # Imports
