@@ -22,6 +22,37 @@ def ensure_lower(*values):
     return list(map(lambda x: x.lower() if isinstance(x, str) else x, values))
 
 
+def check_query_arguments(query, orientation, size, color, locale):
+    # Type annotations above are not needed, for the if-statements below do not use their class' methods.
+    orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
+
+    if not query:
+        raise PexelsSearchError("query parameter must be entered")
+
+    if (orientation is not None) and (orientation not in ["landscape", "portrait", "square"]):
+        raise PexelsSearchError("unsupported or invalid orientation parameter, must either not be set or "
+                                "landscape, portrait or square")
+
+    if (size is not None) and (size not in ["small", "medium", "large"]):
+        raise PexelsSearchError("unsupported or invalid size parameter, must either not be set or small, "
+                                "medium or large")
+
+    if (color is not None) and (color not in SUPPORTED_PHOTO_COLORS) and \
+            (not re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$',
+                           color)):  # Thanks to teoreda StackOverflow for hex col detection
+        raise PexelsSearchError("unsupported or invalid color parameter")
+
+    if (locale is not None) and (locale not in SUPPORTED_LOCATIONS):
+        raise PexelsSearchError("unsupported or invalid locale parameter")
+
+
+def get_query_parameters(**parameters):
+    # Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values
+    if parameters:
+        return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
+    return ""
+
+
 # Constants
 SUPPORTED_PHOTO_COLORS = (
     "red",
@@ -67,6 +98,7 @@ SUPPORTED_LOCATIONS = (
     "ru-RU"
 )
 
+
 # Session class
 class PexelsSession:
     def __init__(self, key: str = None):
@@ -79,34 +111,8 @@ class PexelsSession:
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
-    def _check_query_arguments(self, query, orientation, size, color, locale):
-        orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
 
-        if not query:
-            raise PexelsSearchError("query parameter must be entered")
-
-        if (orientation is not None) and (orientation not in ["landscape", "portrait", "square"]):
-            raise PexelsSearchError("unsupported or invalid orientation parameter, must either not be set or "
-                                    "landscape, portrait or square")
-
-        if (size is not None) and (size not in ["small", "medium", "large"]):
-            raise PexelsSearchError("unsupported or invalid size parameter, must either not be set or small, "
-                                    "medium or large")
-
-        if (color is not None) and (color not in SUPPORTED_PHOTO_COLORS) and \
-                (not re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)):  # Thanks to teoreda StackOverflow for hex col detection
-            raise PexelsSearchError("unsupported or invalid color parameter")
-
-        if (locale is not None) and (locale not in SUPPORTED_LOCATIONS):
-            raise PexelsSearchError("unsupported or invalid locale parameter")
-
-    def get_query_parameters(self, **parameters):
-        # Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values
-        if parameters:
-            return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
-        return ""
-
-    def get_https_response(self, endpoint, origin_function_type=None):
+    def get_https_response(self, endpoint: str, origin_function_type: str | None = None):
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
 
@@ -114,7 +120,8 @@ class PexelsSession:
         verify_response(response, origin_function_type)
         return response
 
-    def find_photo(self, photo_id):
+    # API wrapper functions
+    def find_photo(self, photo_id: int):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
         request_url = f"{targeted_endpoint}/{photo_id}"
@@ -124,7 +131,7 @@ class PexelsSession:
         self.update_rate_limit_attributes(response)
         return PexelsPhoto(response.json())
 
-    def find_video(self, video_id):
+    def find_video(self, video_id: int):
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
         request_url = f"{targeted_endpoint}/{video_id}"
@@ -135,7 +142,7 @@ class PexelsSession:
         return PexelsVideo(response.json())
 
     # Search for curated photos/popular videos
-    def search_curated_photos(self, page=1, per_page=15):
+    def search_curated_photos(self, page: int = 1, per_page: int = 15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -145,8 +152,7 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
-        request_url = self.get_https_response(
-            targeted_endpoint + self.get_query_parameters(page=page, per_page=per_page))
+        request_url = targeted_endpoint + get_query_parameters(page=page, per_page=per_page)
         response = self.get_https_response(request_url).json()
 
         # Returning data and updating rate limit values
@@ -162,12 +168,12 @@ class PexelsSession:
 
     def search_popular_videos(
             self,
-            min_width=None,
-            min_height=None,
-            min_duration=None,
-            max_duration=None,
-            page=1,
-            per_page=15
+            min_width: int | None = None,
+            min_height: int | None = None,
+            min_duration: int | None = None,
+            max_duration: int | None = None,
+            page: int = 1,
+            per_page: int = 15
     ):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
@@ -178,7 +184,7 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"]
-        response = self.get_https_response(targeted_endpoint + self.get_query_parameters(
+        response = self.get_https_response(targeted_endpoint + get_query_parameters(
             min_width=min_width,
             min_height=min_height,
             min_duration=min_duration,
@@ -198,7 +204,7 @@ class PexelsSession:
             _per_page=results["per_page"]
         )
 
-    def search_featured_collections(self, page=1, per_page=15):
+    def search_featured_collections(self, page: int = 1, per_page: int = 15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -207,7 +213,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = ENDPOINTS["POPULAR_VIDEOS"] + self.get_query_parameters(
+        request_url = ENDPOINTS["POPULAR_VIDEOS"] + get_query_parameters(
             page=page,
             per_page=per_page
         )
@@ -234,7 +240,7 @@ class PexelsSession:
         )
 
     # Search owned collection function
-    def search_user_collections(self, page=1, per_page=15):
+    def search_user_collections(self, page: int = 1, per_page: int = 15):
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -243,7 +249,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = ENDPOINTS["USER_COLLECTIONS"] + self.get_query_parameters(
+        request_url = ENDPOINTS["USER_COLLECTIONS"] + get_query_parameters(
             page=page,
             per_page=per_page
         )
@@ -273,7 +279,7 @@ class PexelsSession:
     def find_collection_contents(
             self,
             collection_id: int,
-            media_type: str = None,
+            media_type: str | None = None,
             page: int = 1,
             per_page: int = 15
     ):
@@ -288,7 +294,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = f"{ENDPOINTS['COLLECTION_MEDIA']}/{collection_id}" + self.get_query_parameters(
+        request_url = f"{ENDPOINTS['COLLECTION_MEDIA']}/{collection_id}" + get_query_parameters(
             page=page,
             per_page=per_page,
             type=media_type
@@ -309,17 +315,17 @@ class PexelsSession:
     # Search by keyword functions
     def search_for_photos(
             self,
-            query,
-            orientation=None,
-            size=None,
-            color=None,
-            locale=None,
-            page=1,
-            per_page=15
+            query: str,
+            orientation: str | None = None,
+            size: str | None = None,
+            color: str | None = None,
+            locale: str | None = None,
+            page: int = 1,
+            per_page: int = 15
     ):
         # Checking argument validity
         query = query.strip()
-        self._check_query_arguments(query, orientation, size, color, locale)
+        check_query_arguments(query, orientation, size, color, locale)
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
@@ -327,7 +333,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = ENDPOINTS["SEARCH_PHOTOS"] + self.get_query_parameters(
+        request_url = ENDPOINTS["SEARCH_PHOTOS"] + get_query_parameters(
             query=query,
             orientation=orientation,
             size=size,
@@ -351,16 +357,16 @@ class PexelsSession:
 
     def search_for_videos(
             self,
-            query,
-            orientation=None,
-            size=None,
-            locale=None,
+            query: str,
+            orientation: str | None = None,
+            size: str | None = None,
+            locale: str | None = None,
             page=1,
             per_page=15
     ):
         # Checking argument validity
         query = query.strip()
-        self._check_query_arguments(query, orientation, size, None, locale)  # No such parameter as color for video
+        check_query_arguments(query, orientation, size, None, locale)  # No such parameter as color for video
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
@@ -368,7 +374,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = ENDPOINTS["SEARCH_VIDEOS"] + self.get_query_parameters(
+        request_url = ENDPOINTS["SEARCH_VIDEOS"] + get_query_parameters(
             query=query,
             orientation=orientation,
             size=size,
@@ -415,4 +421,3 @@ class PexelsSession:
     @property
     def requests_rollback_timestamp(self):
         return self._requests_rollback_timestamp
-
