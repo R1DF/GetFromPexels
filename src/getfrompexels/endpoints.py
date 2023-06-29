@@ -1,4 +1,4 @@
-"""This small Python module contains the endpoints that are accessed by a PexelsSession object in a HTTPS request.
+"""This small Python module contains the endpoints that are accessed by a PexelsSession object in an HTTPS request.
 
 Variables:
     ENDPOINTS: A dictionary of all endpoints used by the PexelsSession class.
