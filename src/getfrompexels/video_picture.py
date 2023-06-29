@@ -1,7 +1,7 @@
 """This Python module contains the PexelsVideoPicture dataclass.
 
 Classes:
-    PexelsVideoPicture: The dataclass that contains information about a Pexels video picture.
+    PexelsVideoPicture: The dataclass that contains information about a preview picture of a Pexels video.
 """
 
 # Imports
@@ -11,11 +11,11 @@ from dataclasses import dataclass
 # Class
 @dataclass
 class PexelsVideoPicture:
-    """The dataclass that contains information about a Pexels video picture.
+    """The dataclass that contains information about a preview picture of a Pexels video.
 
     Attributes:
-        pexels_id: The ID of the video picture.
-        picture_url: The URL of the video picture.
+        pexels_id: The ID of the preview picture.
+        picture_url: The URL of the preview picture.
 
     """
 
@@ -25,10 +25,10 @@ class PexelsVideoPicture:
     # Properties
     @property
     def pexels_id(self) -> int:
-        """The ID of the video picture."""
+        """The ID of the preview picture."""
         return self._pexels_id
 
     @property
     def picture_url(self) -> str:
-        """The URL of the video picture."""
+        """The URL of the preview picture."""
         return self._picture_url
