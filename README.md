@@ -41,11 +41,14 @@ photo.download(PATH, "large2x")  # Several sizes accepted
 ```
 
 ## Documentation
-The package's documentation is provided in ReadTheDocs.
+The package's documentation is provided in ReadTheDocs. The code has also been provided with documentation in the form
+of docstrings that follow every start of a module, class, and function.
 
 ## Additional Information
 **The library requires for the `requests` module to be installed.**<br>
 If it isn't, running `pip install requests` in the terminal should install the library.<br>
+
+The minimum Python version that can use this library is Python 3.10.<br>
 
 To request an API key, you must make a Pexels account and get one from the official Pexels website.<br>
 The official documentation for the Pexels APi is https://www.pexels.com/api/documentation/, which contains information about endpoints
