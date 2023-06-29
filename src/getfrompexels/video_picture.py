@@ -1,6 +1,7 @@
 # Imports
 from dataclasses import dataclass
 
+
 # Class
 @dataclass
 class PexelsVideoPicture:
@@ -15,4 +16,3 @@ class PexelsVideoPicture:
     @property
     def picture_url(self) -> str:
         return self._picture_url
-

@@ -420,4 +420,3 @@ class PexelsSession:
     @property
     def requests_rollback_timestamp(self):
         return self._requests_rollback_timestamp
-

@@ -1,6 +1,7 @@
 # Imports
 from dataclasses import dataclass
 
+
 # User class
 @dataclass
 class User:
@@ -8,6 +9,7 @@ class User:
     _url: str
     _pexels_id: int
 
+    # Properties
     @property
     def name(self):
         return self._name
@@ -23,4 +25,3 @@ class User:
     @property
     def username(self):
         return "@" + self.url.split("@")[1]
-

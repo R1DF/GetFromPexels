@@ -67,4 +67,3 @@ class PexelsPhoto:
     @property
     def alt_text(self) -> str:
         return self._alt_text
-

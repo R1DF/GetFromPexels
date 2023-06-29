@@ -1,6 +1,7 @@
 # Imports
 from dataclasses import dataclass
 
+
 # Class
 @dataclass
 class PexelsQueryResults:
@@ -9,7 +10,6 @@ class PexelsQueryResults:
     _total_results: int
     _page: int
     _per_page: int
-
 
     # Properties
     @property
@@ -31,4 +31,3 @@ class PexelsQueryResults:
     @property
     def per_page(self) -> int:
         return self._per_page
-

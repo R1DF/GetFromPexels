@@ -1,8 +1,9 @@
 # Getting exceptions
 from .custom_exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
 
+
 # Response verifier (called by PexelsSession before returning anything)
-def verify_response(response, origin_function_type=None):
+def verify_response(response, origin_function_type: str | None = None):
     status_code = response.status_code
 
     # Making sure the response is valid first

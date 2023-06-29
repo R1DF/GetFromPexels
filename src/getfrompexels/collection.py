@@ -1,6 +1,7 @@
 # Imports
 from dataclasses import dataclass
 
+
 # Collection class
 @dataclass
 class PexelsCollection:
@@ -40,4 +41,3 @@ class PexelsCollection:
     @property
     def videos_count(self) -> int:
         return self._videos_count
-

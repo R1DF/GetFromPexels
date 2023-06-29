@@ -47,4 +47,3 @@ class PexelsVideoFile:
     @property
     def url(self) -> str:
         return self._url
-
