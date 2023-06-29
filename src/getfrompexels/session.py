@@ -17,42 +17,6 @@ import requests
 import re
 
 
-# Non-class function
-def ensure_lower(*values):
-    return list(map(lambda x: x.lower() if isinstance(x, str) else x, values))
-
-
-def check_query_arguments(query, orientation, size, color, locale):
-    # Type annotations above are not needed, for the if-statements below do not use their class' methods.
-    orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
-
-    if not query:
-        raise PexelsSearchError("query parameter must be entered")
-
-    if (orientation is not None) and (orientation not in ["landscape", "portrait", "square"]):
-        raise PexelsSearchError("unsupported or invalid orientation parameter, must either not be set or "
-                                "landscape, portrait or square")
-
-    if (size is not None) and (size not in ["small", "medium", "large"]):
-        raise PexelsSearchError("unsupported or invalid size parameter, must either not be set or small, "
-                                "medium or large")
-
-    if (color is not None) and (color not in SUPPORTED_PHOTO_COLORS) and \
-            (not re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$',
-                           color)):  # Thanks to teoreda StackOverflow for hex col detection
-        raise PexelsSearchError("unsupported or invalid color parameter")
-
-    if (locale is not None) and (locale not in SUPPORTED_LOCATIONS):
-        raise PexelsSearchError("unsupported or invalid locale parameter")
-
-
-def get_query_parameters(**parameters):
-    # Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values
-    if parameters:
-        return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
-    return ""
-
-
 # Constants
 SUPPORTED_PHOTO_COLORS = (
     "red",
@@ -99,19 +63,78 @@ SUPPORTED_LOCATIONS = (
 )
 
 
+# Non-class functions
+def ensure_lower(*values):
+    """Returns a modified list of given values (*values) where all string members are in lowercase."""
+    return list(map(lambda x: x.lower() if isinstance(x, str) else x, values))
+
+
+def check_query_arguments(query, orientation, size, color, locale):
+    """Checks and raises exceptions when arguments passed in a "search" function do not fit required criteria. This
+    function is called inside another method. More information on the arguments can be seen in those functions.
+
+    Raises:
+        PexelsSearchError: When a given argument does not fit its required criteria.
+    """
+    # Type annotations above are not needed, for the if-statements below do not use their class' methods.
+    orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
+
+    if not query:
+        # query is a mandatory string argument that must not be empty
+        raise PexelsSearchError("query parameter must be entered")
+
+    if (orientation is not None) and (orientation not in ["landscape", "portrait", "square"]):
+        # orientation can either be "landscape", "portrait", "square", or left unspecified
+        raise PexelsSearchError("unsupported or invalid orientation parameter, must either not be set or "
+                                "landscape, portrait or square")
+
+    if (size is not None) and (size not in ["small", "medium", "large"]):
+        # size can either be "small", "medium", "large", or left unspecified
+        raise PexelsSearchError("unsupported or invalid size parameter, must either not be set or small, "
+                                "medium or large")
+
+    if (color is not None) and (color not in SUPPORTED_PHOTO_COLORS) and \
+            (not re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$',
+                           color)):  # Thanks to teoreda StackOverflow for hex col detection
+        # color can either be part of SUPPORTED_PHOTO_COLORS, a hex code [#abcdef], or left unspecified
+        raise PexelsSearchError("unsupported or invalid color parameter")
+
+    if (locale is not None) and (locale not in SUPPORTED_LOCATIONS):
+        # locale can either be part of SUPPORTED_LOCATIONS or left unspecified
+        raise PexelsSearchError("unsupported or invalid locale parameter")
+
+
+def get_query_parameters(**parameters):
+    """Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values."""
+    if parameters:
+        return "?" + "&".join([f"{key}={value}" for key, value in parameters.items() if value is not None])
+    return ""
+
+
 # Session class
 class PexelsSession:
     def __init__(self, key: str = None):
+        # TODO add docstring for class itself and at the top of the file, then proceed to other files
         # Initialisation
         self._key = key
 
-        # The values below can only be seen after the first successful request is made.
+        # The values below can only be seen after the first successful request is made. At first, they are set to None.
         self._request_limit = None
         self._requests_left = None
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
     def get_https_response(self, endpoint: str, origin_function_type: str | None = None):
+        """Serves as the main function that makes an HTTPS request to the Pexels API.
+
+        Args:
+            endpoint: HTTPS endpoint to be called.
+            origin_function_type: The type of function that calls the method to phrase errors differently. Optional.
+
+        Raises:
+            PexelsAuthorizationError: When an API key was not provided for the PexelsSession instance.
+        """
+
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
 
@@ -121,6 +144,12 @@ class PexelsSession:
 
     # API wrapper functions
     def find_photo(self, photo_id: int):
+        """Returns a PexelsPhoto object given the photo ID.
+
+        Args:
+            photo_id: The ID of the photo.
+        """
+
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
         request_url = f"{targeted_endpoint}/{photo_id}"
@@ -131,6 +160,12 @@ class PexelsSession:
         return PexelsPhoto(response.json())
 
     def find_video(self, video_id: int):
+        """Returns a PexelsVideo object given the video ID.
+
+        Args:
+            video_id: The ID of the photo.
+        """
+
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
         request_url = f"{targeted_endpoint}/{video_id}"
@@ -142,6 +177,17 @@ class PexelsSession:
 
     # Search for curated photos/popular videos
     def search_curated_photos(self, page: int = 1, per_page: int = 15):
+        """Returns a PexelsQueryResults object containing photos curated by the Pexels team given the searched page and
+        amount of photos to feature in the page.
+
+        Args:
+            page: The page number that is being requested. Default is 1.
+            per_page: The number of results that is being requested for the page. Default is 15, maximum is 80.
+
+        Raises:
+            PexelsSearchError: When page is less than 1 or per_page is out of the 1 <= per_page <= 80 range.
+        """
+
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -174,7 +220,29 @@ class PexelsSession:
             page: int = 1,
             per_page: int = 15
     ):
+        """Returns a PexelsQueryResults object containing popular Pexels videos with several parameters.
+
+        Args:
+            min_width: The minimum width in pixels of the returned videos. Optional.
+            min_height: The minimum height in pixels of the returned videos. Optional.
+            min_duration: The minimum duration of the returned videos in seconds. Optional.
+            max_duration: The maximum duration of the returned videos in seconds. Optional.
+            page: The page number that is being requested. Default is 1.
+            per_page: The number of results that is being requested for the page. Default is 15, maximum is 80.
+
+        Raises:
+            PexelsSearchError: When specific criteria aren't met, such as max_duration being less than min_duration,
+            or negative values being present for the first 5 arguments, or per_page not fitting in the 1 <= per_page <=
+            80 range.
+        """
+
         # Checking specific argument validity
+        if max_duration < min_duration:
+            raise PexelsSearchError("max_duration cannot be less than min_duration")
+
+        if any(map(lambda x: x < 0, [min_width, min_height, min_duration, max_duration])):  ##TODO check if map is an iterable that can be accessed from any
+            raise PexelsSearchError("negative minimums/maximums are invalid")
+
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
 
