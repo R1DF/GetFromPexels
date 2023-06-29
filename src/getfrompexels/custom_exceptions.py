@@ -1,20 +1,32 @@
-"""
-This class contains custom-made exceptions for GetFromPexels.
+"""This Python module contains custom exceptions that are called in the case of an error.
+
+Classes:
+    PexelsAuthorizationError: Error that is raised when an API key is not given or is invalid but a request is called.
+    PexelsSearchError: Error that is raised when a "search" function encounters an error.
+    PexelsLookupError: Error that is raised when a "find" function encounters an error."
+    PexelsAPIRequestError: More in-detail error that is raised when an HTTP response has an invalid status code after a request goes
+    through the verify_response function.
+
 """
 
 
+# Exceptions
 class PexelsAuthorizationError(Exception):
+    """Error that is raised when an API key is not given or is invalid but a request is called."""
     pass
 
 
-class PexelsSearchError(Exception):  # For search functions
+class PexelsSearchError(Exception):
+    """Error that is raised when a "search" function encounters an error."""
     pass
 
 
-class PexelsLookupError(Exception):  # For find functions
+class PexelsLookupError(Exception):
+    """Error that is raised when a "find" function encounters an error."""
     pass
 
 
 class PexelsAPIRequestError(Exception):
-    # Will be called when an HTTPS response does not return 200 (PexelsLookupError sometimes can substitute for 404).
+    """More in-detail error that is raised when an HTTP response has an invalid status code after a request goes
+    through the verify_response function."""
     pass
