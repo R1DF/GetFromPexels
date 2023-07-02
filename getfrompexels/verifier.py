@@ -7,7 +7,7 @@ Functions:
 """
 
 # Getting exceptions
-from .custom_exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
+from .exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
 import requests
 
 

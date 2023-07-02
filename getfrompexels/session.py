@@ -20,7 +20,7 @@ Variables:
 """
 
 # Imports
-from .custom_exceptions import *
+from .exceptions import *
 from .photo import PexelsPhoto
 from .video import PexelsVideo
 from .collection import PexelsCollection
