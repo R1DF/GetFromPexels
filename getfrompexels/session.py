@@ -310,8 +310,14 @@ class PexelsSession:
 
         # Checking specific argument validity
         if (max_duration is not None) and (min_duration is not None):
-            if max_duration < min_duration:
-                raise PexelsSearchError("max_duration cannot be less than min_duration")
+            if isinstance(max_duration, int) and isinstance(min_duration, int):
+                if max_duration < min_duration:
+                    raise PexelsSearchError("max_duration cannot be less than min_duration")
+            else:
+                raise PexelsSearchError("duration parameters must be integers")
+
+        if not isinstance(min_height, int):
+            raise PexelsSearchError("min_height parameter must be integers")
 
         if any(map(lambda x: x < 0, [min_width, min_height, min_duration, max_duration])):
             raise PexelsSearchError("negative minimums/maximums are invalid")
