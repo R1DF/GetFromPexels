@@ -272,11 +272,11 @@ class PexelsSession:
         # Making request
         targeted_endpoint = ENDPOINTS["CURATED_PHOTOS"]
         request_url = targeted_endpoint + get_query_parameters(page=page, per_page=per_page)
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url)
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
-        results = response.json()
         return PexelsQueryResults(
             _content=[PexelsPhoto(x) for x in results["photos"]],
             _url=targeted_endpoint,
@@ -335,6 +335,7 @@ class PexelsSession:
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         results = response.json()
+
         return PexelsQueryResults(
             _content=[PexelsVideo(x) for x in results["videos"]],
             _url=targeted_endpoint,
