@@ -315,12 +315,12 @@ class PexelsSession:
                     raise PexelsSearchError("max_duration cannot be less than min_duration")
             else:
                 raise PexelsSearchError("duration parameters must be integers")
+        if min_height is not None:
+            if not isinstance(min_height, int):
+                raise PexelsSearchError("min_height parameter must be integers")
 
-        if not isinstance(min_height, int):
-            raise PexelsSearchError("min_height parameter must be integers")
-
-        if any(map(lambda x: x < 0, [min_width, min_height, min_duration, max_duration])):
-            raise PexelsSearchError("negative minimums/maximums are invalid")
+        if any(map(lambda x: x <= 0 if x is not None else False, [min_width, min_height, min_duration, max_duration])):
+            raise PexelsSearchError("negative and zero minimums/maximums are invalid")
 
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -337,12 +337,11 @@ class PexelsSession:
             max_duration=max_duration,
             page=page,
             per_page=per_page
-        )).json()
+        ))
+        results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
-        results = response.json()
-
         return PexelsQueryResults(
             _content=[PexelsVideo(x) for x in results["videos"]],
             _url=targeted_endpoint,
@@ -374,7 +373,7 @@ class PexelsSession:
             page=page,
             per_page=per_page
         )
-        response = self.get_https_response(request_url).json()
+        response = self.get_https_response(request_url)
         results = response.json()
 
         # Returning data and updating rate limit values
