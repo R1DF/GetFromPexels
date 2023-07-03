@@ -156,7 +156,7 @@ class PexelsSession:
         search_featured_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
         Returns PexelsQueryResults object containing featured collections.
 
-        search_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
+        find_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
         Returns PexelsQueryResults object containing collections that the user has.
 
         find_collection_contents(self, collection_id: int, media_type: str | None = None, page: int = 1,
@@ -389,7 +389,7 @@ class PexelsSession:
         )
 
     # Search owned collection function
-    def search_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
+    def find_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object containing the collections saved by the user.
 
         Args:
