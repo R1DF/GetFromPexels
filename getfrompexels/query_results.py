@@ -6,6 +6,8 @@ Classes:
 
 # Imports
 from dataclasses import dataclass
+from photo import PexelsPhoto
+from video import PexelsVideo
 
 
 # Class
@@ -29,7 +31,7 @@ class PexelsQueryResults:
 
     # Properties
     @property
-    def content(self) -> list:
+    def content(self) -> list[PexelsPhoto | PexelsVideo]:
         """The list of photos/pictures/collections returned by the query."""
         return self._content
 
