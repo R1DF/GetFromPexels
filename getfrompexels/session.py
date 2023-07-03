@@ -270,7 +270,7 @@ class PexelsSession:
             PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
+        targeted_endpoint = ENDPOINTS["CURATED_PHOTOS"]
         request_url = targeted_endpoint + get_query_parameters(page=page, per_page=per_page)
         response = self.get_https_response(request_url).json()
 
@@ -362,7 +362,7 @@ class PexelsSession:
             raise PexelsSearchError("page parameter must be at least 1")
 
         # Making request
-        request_url = ENDPOINTS["POPULAR_VIDEOS"] + get_query_parameters(
+        request_url = ENDPOINTS["FEATURED_COLLECTIONS"] + get_query_parameters(
             page=page,
             per_page=per_page
         )
