@@ -447,7 +447,7 @@ class PexelsSession:
 
         Args:
             collection_id: The ID of the collection the contents of which are being requested.
-            media_type: The specific type of media that is being requested, either "photo" or "video". Optional, if not provided or an invalid value is given then the media will not be filtered at all.
+            media_type: The specific type of media that is being requested, either "photos" or "videos". Optional, if not provided or an invalid value is given then the media will not be filtered at all.
             page: The results page number that is being requested.
             per_page: Amount of media that will be returned in the page. Default is 15. Maximum is 80.
 
@@ -457,7 +457,7 @@ class PexelsSession:
         """
 
         # Checking specific argument validity
-        if media_type not in ["photo", "video"]:
+        if media_type not in ["photos", "videos"]:
             media_type = None  # Done to remove from parameters section in request URL
 
         if per_page > 80 or per_page < 1:
@@ -478,7 +478,7 @@ class PexelsSession:
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
-            _content=results["media"],
+            _content=[PexelsPhoto(x) if x["type"] == "Photo" else PexelsVideo(x) for x in results["media"]],
             _url=request_url,
             _total_results=results["total_results"],
             _page=results["page"],
