@@ -20,8 +20,7 @@ def verify_response(response: requests.Response, origin_function_type: str | Non
         origin_function_type: The type of the method that called this function. Optional.
 
     Raises:
-        PexelsAuthorizationError: Raised on HTTP Error 401 if the request returns an Unauthorized error, meaning there
-        is no given API key.
+        PexelsAuthorizationError: Raised on HTTP Error 401 if the request returns an Unauthorized error, meaning there is no given API key.
         PexelsLookupError: Raised if no media is found after a "find" function calls this method.
         PexelsAPIRequestError: Raised if any other HTTP error is given due to a non-200 status code.
 

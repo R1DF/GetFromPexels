@@ -305,9 +305,7 @@ class PexelsSession:
             per_page: The number of videos that is being requested for the page. Default is 15, maximum is 80.
 
         Raises:
-            PexelsSearchError: When specific criteria aren't met, such as max_duration being less than min_duration,
-            or negative values being present for the first 5 arguments, or per_page not fitting in the 1 <= per_page <=
-            80 range.
+            PexelsSearchError: When specific criteria aren't met, such as max_duration being less than min_duration, or negative values being present for the first 5 arguments, or per_page not fitting in the 1 <= per_page <= 80 range.
         """
 
         # Checking specific argument validity
@@ -353,8 +351,7 @@ class PexelsSession:
             per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
 
         Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
-            per_page <= 80 range.
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
         """
 
         # Checking specific argument validity
@@ -400,8 +397,7 @@ class PexelsSession:
             per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
 
         Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
-            per_page <= 80 range.
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
         """
 
         # Checking specific argument validity
@@ -451,8 +447,7 @@ class PexelsSession:
 
         Args:
             collection_id: The ID of the collection the contents of which are being requested.
-            media_type: The specific type of media that is being requested, either "photo" or "video". Optional,
-            if not provided or an invalid value is given then the media will not be filtered at all.
+            media_type: The specific type of media that is being requested, either "photo" or "video". Optional, if not provided or an invalid value is given then the media will not be filtered at all.
             page: The results page number that is being requested.
             per_page: Amount of media that will be returned in the page. Default is 15. Maximum is 80.
 
@@ -506,14 +501,10 @@ class PexelsSession:
 
         Args:
              query: The query that is being searched.
-             orientation: The selected orientation of the photos. Either "landscape", "portrait", or "square". Optional,
-             if it's not given then photos of any orientation will show up.
-             size: The chosen size of the photos. Either "large" (24MP), "medium" (12MP), or "small" (4MP). Optional,
-             if it's not given then photos of any size will show up.
-             color: Desired color of the photo. Can either be a hex value or part of SUPPORTED_PHOTO_COLORS. Optional,
-             if it's not given the photos of any color will show up.
-             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not
-             given then photos regardless of locale will show up.
+             orientation: The selected orientation of the photos. Either "landscape", "portrait", or "square". Optional, if it's not given then photos of any orientation will show up.
+             size: The chosen size of the photos. Either "large" (24MP), "medium" (12MP), or "small" (4MP). Optional, if it's not given then photos of any size will show up.
+             color: Desired color of the photo. Can either be a hex value or part of SUPPORTED_PHOTO_COLORS. Optional, if it's not given the photos of any color will show up.
+             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not given then photos regardless of locale will show up.
              page: The results page number that is being requested.
              per_page: Amount of photos that will be returned in the page. Default is 15. Maximum is 80.
 
@@ -530,6 +521,9 @@ class PexelsSession:
 
         if page < 1:
             raise PexelsSearchError("page parameter must be at least 1")
+
+        if color is not None:
+            color = color[1:]  # Slice done to remove the # from the hex code! (no following arguments become ignored)
 
         # Making request
         request_url = ENDPOINTS["SEARCH_PHOTOS"] + get_query_parameters(
@@ -568,18 +562,14 @@ class PexelsSession:
 
         Args:
              query: The query that is being searched.
-             orientation: The selected orientation of the videos. Either "landscape", "portrait", or "square". Optional,
-             if it's not given then videos of any orientation will show up.
-             size: The chosen size of the videos. Either "large" (4K), "medium" (Full HD), or "small" (HD). Optional,
-             if it's not given then videos of any size will show up.
-             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not
-             given then videos regardless of locale will show up.
+             orientation: The selected orientation of the videos. Either "landscape", "portrait", or "square". Optional, if it's not given then videos of any orientation will show up.
+             size: The chosen size of the videos. Either "large" (4K), "medium" (Full HD), or "small" (HD). Optional, if it's not given then videos of any size will show up.
+             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not given then videos regardless of locale will show up.
              page: The results page number that is being requested.
              per_page: Amount of videos that will be returned in the page. Default is 15. Maximum is 80.
 
         Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
-            per_page <= 80 range.
+            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
         """
 
         # Checking argument validity

@@ -31,8 +31,7 @@ class PexelsVideoFile:
         """Constructor of the class.
 
         Args:
-            json_content: A dictionary containing data about the video file for a given video after a successful API
-            request.
+            json_content: A dictionary containing data about the video file for a given video after a successful API request.
         """
 
         # Initialization of attributes

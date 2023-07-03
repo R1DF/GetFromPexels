@@ -64,8 +64,7 @@ class PexelsPhoto:
         wish.
 
         Args:
-            path: The path and the filename of the file that the photo will be saved as. The .JPG extension will be
-            added by default.
+            path: The path and the filename of the file that the photo will be saved as. The .JPG extension will be added by default.
             size: The size of the photo that will be saved from the "links" property. Default is "original".
         """
 
