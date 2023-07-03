@@ -312,7 +312,7 @@ class PexelsSession:
         if max_duration < min_duration:
             raise PexelsSearchError("max_duration cannot be less than min_duration")
 
-        if any(map(lambda x: x < 0, [min_width, min_height, min_duration, max_duration])):  ##TODO check if map is an iterable that can be accessed from any
+        if any(map(lambda x: x < 0, [min_width, min_height, min_duration, max_duration])):
             raise PexelsSearchError("negative minimums/maximums are invalid")
 
         if per_page > 80 or per_page < 1:
