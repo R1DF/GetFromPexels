@@ -23,7 +23,7 @@ class PexelsCollection:
         videos_count: Total amount of videos in the collection.
     """
 
-    _pexels_id: int
+    _pexels_id: str
     _title: str
     _description: str
     _is_private: bool
@@ -33,7 +33,7 @@ class PexelsCollection:
 
     # Properties
     @property
-    def pexels_id(self) -> int:
+    def pexels_id(self) -> str:
         """The ID of the collection."""
         return self._pexels_id
 

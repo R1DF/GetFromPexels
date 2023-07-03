@@ -437,7 +437,7 @@ class PexelsSession:
     # Search media in collection
     def find_collection_contents(
             self,
-            collection_id: int,
+            collection_id: str,
             media_type: str | None = None,
             page: int = 1,
             per_page: int = 15
