@@ -20,6 +20,7 @@ class PexelsPhoto:
         average_color: The hex code of the average color of the photo.
         photographer: PexelsUser object that contains information about the photographer.
         links: A dictionary containing direct links to the image in varying sizes.
+        is_liked: A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object.
         alt_text: Alt text for the image.
 
     Methods:
@@ -54,6 +55,7 @@ class PexelsPhoto:
             "landscape": json_content["src"]["landscape"],
             "tiny": json_content["src"]["tiny"]
         }
+        self._liked_by_user = json_content["liked"]
         self._alt_text = json_content["alt"]
 
     # Methods
@@ -100,6 +102,11 @@ class PexelsPhoto:
     def links(self) -> dict:
         """A dictionary containing direct links to the image in varying sizes."""
         return self._links
+
+    @property
+    def liked_by_user(self) -> str:
+        """A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object."""
+        return self._liked_by_user
 
     @property
     def alt_text(self) -> str:
