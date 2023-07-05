@@ -485,7 +485,7 @@ class PexelsSession:
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
-            _content=[PexelsPhoto(x) if x["type"] == "Photo" else PexelsVideo(x) for x in results["media"]],
+            _content=[PexelsPhoto(x, True) if x["type"] == "Photo" else PexelsVideo(x) for x in results["media"]],
             _url=request_url,
             _total_results=results["total_results"],
             _page=results["page"],
