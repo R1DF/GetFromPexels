@@ -20,7 +20,7 @@ class PexelsPhoto:
         average_color: The hex code of the average color of the photo.
         photographer: PexelsUser object that contains information about the photographer.
         links: A dictionary containing direct links to the image in varying sizes.
-        is_liked: A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object.
+        is_liked: A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object. If the photo was returned from find_collection_contents() it is None as it doesn't appear to be returned properly when that method is called.
         alt_text: Alt text for the image.
 
     Methods:
@@ -28,7 +28,7 @@ class PexelsPhoto:
         Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they wish.
     """
 
-    def __init__(self, json_content: dict):
+    def __init__(self, json_content: dict, hide_liked: bool = False):
         """Constructor of the class.
 
         Args:
@@ -55,7 +55,7 @@ class PexelsPhoto:
             "landscape": json_content["src"]["landscape"],
             "tiny": json_content["src"]["tiny"]
         }
-        self._liked_by_user = json_content["liked"]
+        self._liked_by_user = json_content["liked"] if not hide_liked else None
         self._alt_text = json_content["alt"]
 
     # Methods
@@ -104,8 +104,8 @@ class PexelsPhoto:
         return self._links
 
     @property
-    def liked_by_user(self) -> str:
-        """A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object."""
+    def liked_by_user(self) -> bool | None:
+        """A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object. If the photo was returned from find_collection_contents() it is None as it doesn't appear to be returned properly when that method is called."""
         return self._liked_by_user
 
     @property
