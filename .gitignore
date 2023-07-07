@@ -3,3 +3,4 @@ venv/
 tests/
 *.xml
 *.iml
+dist/
