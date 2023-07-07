@@ -48,32 +48,32 @@ SUPPORTED_PHOTO_COLORS = (
 )
 
 SUPPORTED_LOCATIONS = (
-    "en-US",
-    "pt-BR",
-    "es-ES",
+    "en-us",
+    "pt-br",
+    "es-es",
     "it-it",
-    "fr-FR",
-    "sv-SE",
-    "id-ID",
-    "pl=PL",
-    "ja-JP",
-    "zh-TW",
-    "zh-CN",
-    "ko-KR",
-    "th-TH",
-    "nl-NL",
-    "hu-HU",
-    "vi-VN",
-    "cs-CZ",
-    "da-DK",
-    "fi-FI",
-    "uk-UA",
-    "el-GR",
-    "ro-RO",
-    "nb-NO",
-    "sk-SK",
-    "tr-TR",
-    "ru-RU"
+    "fr-fr",
+    "sv-se",
+    "id-id",
+    "pl-pl",
+    "ja-jp",
+    "zh-tw",
+    "zh-cn",
+    "ko-kr",
+    "th-th",
+    "nl-nl",
+    "hu-hu",
+    "vi-vn",
+    "cs-cz",
+    "da-dk",
+    "fi-fi",
+    "uk-ua",
+    "el-gr",
+    "ro-ro",
+    "nb-no",
+    "sk-sk",
+    "tr-tr",
+    "ru-ru"
 )
 
 
@@ -186,7 +186,7 @@ class PexelsSession:
         Args:
             key: The API key used. Can be left optional and set later but the object will be useless without it.
         """
-        # TODO add docstring for class itself and at the top of the file, then proceed to other files
+
         # Initialisation
         if not (isinstance(key, str) or key is None):
             raise TypeError("key must either be not given/None or a str object")
