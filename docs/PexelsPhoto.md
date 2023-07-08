@@ -6,7 +6,7 @@ This document provides a small outline of the structure of the `PexelsPhoto` cla
 The ID of the photo on Pexels.
 
 ## `size`
-A list containing the width and height of the photo, both as integers, meaasured in pixels.
+A list containing the width and height of the photo, both as integers, measured in pixels.
 
 ## `pexels_url`
 The URL to the photo in the Pexels website.
