@@ -27,7 +27,7 @@ The code below shows you how to create a session with the 2 ways. Neither will c
 
 # Using methods provided by the methods
 Now with your session object, you can now use the Pexels API. The Pexels API provides a variety of endpoints (think of them as links that are used to get specific data) in this [link](https://www.pexels.com/api/documentation/), and
-GetFromPexels allows them all to be used. Basic methods will be shown below, and the rest can be seen by going in the docstrings of the session.py file or in the specific markdown file `session.md`.
+GetFromPexels allows them all to be used. Basic methods will be shown below, and the rest can be seen by going in the docstrings of the session.py file or in the specific markdown file `PexelsSession.md`.
 
 ## Finding a photo and printing out direct links to it
 ```py
@@ -110,7 +110,7 @@ video.video_files[0].download("video_file")
 
 This code snipped will not return anything to the terminal. However, it will save a photo and a video to your computer! Both photos and videos can be downloaded with the use of just
 one single function, where its path is given (the extension must not be given, a default is applied). Notice that the video object has several `video_files` that can be downloaded. For now,
-we can just download any of them. Video files ard delved into more detail in `video.md`.
+we can just download any of them. Video files are delved into more detail in `PexelsVideoFile.md`.
 
 ## Other functions?
 As previously said, there are other methods. Here is a list of some others as of v1.0.0:
