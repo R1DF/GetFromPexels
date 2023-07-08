@@ -1,5 +1,5 @@
 # PexelsVideoPicture
-This document contains information on the `PexelsVideoPicture` class, which there are barely any of.
+This document contains information on the `PexelsVideoPicture` dataclass, which there are barely any of.
 
 # Attributes
 ## `pexels_id`
