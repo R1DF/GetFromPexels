@@ -4,6 +4,7 @@ from typing import Literal, TypedDict
 # Type aliases go below (can get imported by other modules)
 QueryMethod = Literal["search", "find"]
 Orientation = Literal["landscape", "portrait", "square"]
+CollectionMediaType = Literal["photos", "videos"]
 Size = Literal["small", "medium", "large"]
 Dimensions = tuple[int, int]  # (width, height) both in px
 
