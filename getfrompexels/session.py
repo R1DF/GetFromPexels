@@ -27,7 +27,7 @@ from .collection import PexelsCollection
 from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
 from .verifier import verify_response
-from .type_annotations import QueryMethod
+from .type_annotations import QueryMethod, CollectionMediaType, Orientation, Size
 from typing import Optional
 import requests
 import re
@@ -89,8 +89,7 @@ def check_query_arguments(query, orientation, size, color, locale):
     """Checks and raises exceptions when arguments passed in a "search" function do not fit required criteria. This
     function is called inside another method. More information on the arguments can be seen in those functions.
 
-    Raises:
-        PexelsSearchError: When a given argument does not fit its required criteria.
+    :raises PexelsSearchError: When a given argument does not fit its required criteria
     """
     # Type annotations above are not needed, for the if-statements below do not use their class' methods.
     orientation, size, color, locale = ensure_lower(orientation, size, color, locale)
@@ -185,8 +184,8 @@ class PexelsSession:
         """
         Constructor of the PexelsSession object.
 
-        Args:
-            key: The API key used. Can be left optional and set later but the object will be useless without it.
+        :param key: The API key used, if not provided then must be set later on in the code
+        :type key: str, optional
         """
 
         # Initialisation
@@ -200,16 +199,19 @@ class PexelsSession:
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
-    def get_https_response(self, endpoint: str, origin_function_type: QueryMethod = "none") -> requests.Response:
+    def get_https_response(self, endpoint: str, origin_function_type: Optional[QueryMethod] = None) -> requests.Response:
         """Serves as the main function that makes an HTTPS request to the Pexels API. Returns a requests.Response
         object.
 
-        Args:
-            endpoint: HTTPS endpoint to be called.
-            origin_function_type: The type of function that calls the method to phrase errors differently. Optional.
+        :param: endpoint: HTTPS endpoint to be called, must be part of the ENDPOINTS dictionary in endpoints.py
+        :type endpoint: str
+        :param: origin_function_type: The type of function that calls the method to phrase errors differently
+        :type origin_function_type: QueryMethod, optional
 
-        Raises:
-            PexelsAuthorizationError: When an API key was not provided for the PexelsSession instance.
+        :raises: PexelsAuthorizationError: When an API key was not provided for the PexelsSession instance
+
+        :return: A Response object that was returned from the request made in the method call
+        :rtype: requests.Response
         """
 
         if self._key is None:
@@ -223,8 +225,10 @@ class PexelsSession:
     def find_photo(self, photo_id: int) -> PexelsPhoto:
         """Returns a PexelsPhoto object given the photo ID.
 
-        Args:
-            photo_id: The ID of the photo.
+        :param: photo_id: The ID of the photo
+        :type: photo_id: int
+
+        :return: PexelsPhoto
         """
 
         # Making request
@@ -239,8 +243,10 @@ class PexelsSession:
     def find_video(self, video_id: int) -> PexelsVideo:
         """Returns a PexelsVideo object given the video ID.
 
-        Args:
-            video_id: The ID of the photo.
+        :param video_id: The ID of the video
+        :type video_id: int
+
+        :return: PexelsVideo
         """
 
         # Making request
@@ -256,12 +262,12 @@ class PexelsSession:
     def search_curated_photos(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object containing photos curated by the Pexels team.
 
-        Args:
-            page: The results page number that is being requested. Default is 1.
-            per_page: The number of photos that is being requested for the page. Default is 15, maximum is 80.
+        :param page: The results page number that is being requested, defaults to 1
+        :type page: int
+        :param per_page: The number of photos that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When page is less than 1 or per_page is out of the 1 <= per_page <= 80 range.
+        :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
         """
 
         # Checking specific argument validity
@@ -298,16 +304,23 @@ class PexelsSession:
     ) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object containing popular Pexels videos with optional parameters.
 
-        Args:
-            min_width: The minimum width in pixels of the returned videos. Optional.
-            min_height: The minimum height in pixels of the returned videos. Optional.
-            min_duration: The minimum duration of the returned videos in seconds. Optional.
-            max_duration: The maximum duration of the returned videos in seconds. Optional.
-            page: The results page number that is being requested. Default is 1.
-            per_page: The number of videos that is being requested for the page. Default is 15, maximum is 80.
+        :param min_width: The minimum width in pixels of the returned videos
+        :type min_width: int, optional
+        :param min_height: The minimum height in pixels of the returned videos
+        :type min_height: int, optional
+        :param min_duration: The minimum duration of the returned videos in seconds
+        :type min_duration: int, optional
+        :param max_duration: The maximum duration of the returned videos in seconds
+        :type max_duration: int, optional
+        :param page: The results page number that is being requested
+        :type page: int The results page number that is being requested, defaults to 1
+        :param per_page: The number of videos that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When specific criteria aren't met, such as max_duration being less than min_duration, or negative values being present for the first 5 arguments, or per_page not fitting in the 1 <= per_page <= 80 range.
+        :raises PexelsSearchError: When specific criteria aren't met, like max_duration being less than min_duration,
+        or negative values being present for the first 5 arguments, or per_page being less than 1 or over 80
+
+        :return: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -355,12 +368,12 @@ class PexelsSession:
     def search_featured_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object containing featured Pexels collections.
 
-        Args:
-            page: The results page number that is being requested. Default is 1.
-            per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
+        :param page: The results page number that is being requested, defaults to 1
+        :type page: int The results page number that is being requested
+        :param per_page: The number of collections that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
+        :return: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -401,12 +414,14 @@ class PexelsSession:
     def find_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object containing the collections saved by the user.
 
-        Args:
-            page: The results page number that is being requested.
-            per_page: Amount of collections that will be returned in the page. Default is 15. Maximum is 80.
+        :param page: The results page number that is being requested, defaults to 1
+        :type page: int The results page number that is being requested
+        :param per_page: The number of collections that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
+        :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
+
+        :return: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -447,22 +462,25 @@ class PexelsSession:
     def find_collection_contents(
             self,
             collection_id: str,
-            media_type: Optional[str] = None,
+            media_type: Optional[CollectionMediaType] = None,
             page: int = 1,
             per_page: int = 15
     ) -> PexelsQueryResults:
         """Returns a PexelsQueryResults object that contains media that is part of a given collection. The
         media type can be filtered out.
 
-        Args:
-            collection_id: The ID of the collection the contents of which are being requested.
-            media_type: The specific type of media that is being requested, either "photos" or "videos". Optional, if not provided or an invalid value is given then the media will not be filtered at all.
-            page: The results page number that is being requested.
-            per_page: Amount of media that will be returned in the page. Default is 15. Maximum is 80.
+        :param collection_id: The ID of the collection the contents of which are being requested
+        :type collection_id: str
+        :param media_type: The ID of the collection the contents of which are being requested
+        :type media_type: str, optional
+        :param page: The results page number that is being requested, defaults to 1
+        :type page: int The results page number that is being requested
+        :param per_page: The number of media that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
-            per_page <= 80 range.
+        :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
+
+        :return: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -498,8 +516,8 @@ class PexelsSession:
     def search_for_photos(
             self,
             query: str,
-            orientation: Optional[str] = None,
-            size: Optional[str] = None,
+            orientation: Optional[Orientation] = None,
+            size: Optional[Size] = None,
             color: Optional[str] = None,
             locale: Optional[str] = None,
             page: int = 1,
@@ -508,18 +526,24 @@ class PexelsSession:
         """Searches for photos given a specific query and some optional parameters and returns a PexelsQueryResults
         object with the photos that are returned.
 
-        Args:
-             query: The query that is being searched.
-             orientation: The selected orientation of the photos. Either "landscape", "portrait", or "square". Optional, if it's not given then photos of any orientation will show up.
-             size: The chosen size of the photos. Either "large" (24MP), "medium" (12MP), or "small" (4MP). Optional, if it's not given then photos of any size will show up.
-             color: Desired color of the photo. Can either be a hex value or part of SUPPORTED_PHOTO_COLORS. Optional, if it's not given the photos of any color will show up.
-             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not given then photos regardless of locale will show up.
-             page: The results page number that is being requested.
-             per_page: Amount of photos that will be returned in the page. Default is 15. Maximum is 80.
+        :param query: The query that is being searched
+        :type query: str
+        :param orientation: The selected orientation of the photos. Can be "landscape", "portrait", or "square"
+        :type orientation: str, optional
+        :param size: The chosen size of the photos. Can be "large" (24MP), "medium" (12MP), or "small" (4MP)
+        :type size: str, optional
+        :param color: Desired color of the photo. Can either be a hex value or part of SUPPORTED_PHOTO_COLORS
+        :type color: str, optional
+        :param locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS
+        :type locale: str, optional
+        :param page: The results page number that is being requested, defaults to 1
+        :type page: int The results page number that is being requested
+        :param per_page: The number of photos that is being requested for the page. Maximum is 80, defaults to 15
+        :type per_page: int
 
-        Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <=
-            per_page <= 80 range.
+        :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
+
+        :return: PexelsQueryResults
         """
 
         # Checking argument validity
