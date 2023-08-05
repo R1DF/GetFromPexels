@@ -27,6 +27,8 @@ from .collection import PexelsCollection
 from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
 from .verifier import verify_response
+from .type_annotations import QueryMethod
+from typing import Optional
 import requests
 import re
 
@@ -198,7 +200,7 @@ class PexelsSession:
         self._requests_rollback_timestamp = None
 
     # Functions to shorten code
-    def get_https_response(self, endpoint: str, origin_function_type: str | None = None) -> requests.Response:
+    def get_https_response(self, endpoint: str, origin_function_type: QueryMethod = "none") -> requests.Response:
         """Serves as the main function that makes an HTTPS request to the Pexels API. Returns a requests.Response
         object.
 
@@ -287,10 +289,10 @@ class PexelsSession:
 
     def search_popular_videos(
             self,
-            min_width: int | None = None,
-            min_height: int | None = None,
-            min_duration: int | None = None,
-            max_duration: int | None = None,
+            min_width: Optional[int] = None,
+            min_height: Optional[int] = None,
+            min_duration: Optional[int] = None,
+            max_duration: Optional[int] = None,
             page: int = 1,
             per_page: int = 15
     ) -> PexelsQueryResults:
@@ -445,7 +447,7 @@ class PexelsSession:
     def find_collection_contents(
             self,
             collection_id: str,
-            media_type: str | None = None,
+            media_type: Optional[str] = None,
             page: int = 1,
             per_page: int = 15
     ) -> PexelsQueryResults:
@@ -496,10 +498,10 @@ class PexelsSession:
     def search_for_photos(
             self,
             query: str,
-            orientation: str | None = None,
-            size: str | None = None,
-            color: str | None = None,
-            locale: str | None = None,
+            orientation: Optional[str] = None,
+            size: Optional[str] = None,
+            color: Optional[str] = None,
+            locale: Optional[str] = None,
             page: int = 1,
             per_page: int = 15
     ) -> PexelsQueryResults:
@@ -558,9 +560,9 @@ class PexelsSession:
     def search_for_videos(
             self,
             query: str,
-            orientation: str | None = None,
-            size: str | None = None,
-            locale: str | None = None,
+            orientation: Optional[str] = None,
+            size: Optional[str] = None,
+            locale: Optional[str] = None,
             page=1,
             per_page=15
     ) -> PexelsQueryResults:

@@ -8,11 +8,13 @@ Functions:
 
 # Getting exceptions
 from .exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
+from .type_annotations import QueryMethod
+from typing import Optional
 import requests
 
 
 # Response verifier (called by PexelsSession before it returns anything)
-def verify_response(response: requests.Response, origin_function_type: str | None = None):
+def verify_response(response: requests.Response, origin_function_type: Optional[QueryMethod]):
     """Runs through a response and sees if it has returned a valid status code to raise an exception if it didn't.
 
     Args:

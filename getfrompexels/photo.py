@@ -6,6 +6,7 @@ Classes:
 
 # Imports
 from .user import PexelsUser
+from .type_annotations import RawPhotoContent, Dimensions
 import requests
 
 
@@ -28,7 +29,7 @@ class PexelsPhoto:
         Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they wish.
     """
 
-    def __init__(self, json_content: dict, hide_liked: bool = False):
+    def __init__(self, json_content: RawPhotoContent, hide_liked: bool = False):
         """Constructor of the class.
 
         Args:
@@ -37,7 +38,7 @@ class PexelsPhoto:
 
         # Initialization of read-only attributes
         self._pexels_id = json_content["id"]
-        self._size = [json_content["width"], json_content["height"]]
+        self._size = (json_content["width"], json_content["height"])
         self._pexels_url = json_content["url"]
         self._average_color = json_content["avg_color"]
         self._photographer = PexelsUser(
@@ -79,7 +80,7 @@ class PexelsPhoto:
         return self._pexels_id
 
     @property
-    def size(self) -> list[int]:
+    def size(self) -> Dimensions:
         """A list containing the width and height of the photo in pixels."""
         return self._size
 
@@ -99,7 +100,7 @@ class PexelsPhoto:
         return self._photographer
 
     @property
-    def links(self) -> dict:
+    def links(self) -> dict[str, str]:
         """A dictionary containing direct links to the image in varying sizes."""
         return self._links
 

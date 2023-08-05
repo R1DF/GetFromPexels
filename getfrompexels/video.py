@@ -8,6 +8,7 @@ Classes:
 from .user import PexelsUser
 from .video_file import PexelsVideoFile
 from .video_picture import PexelsVideoPicture
+from .type_annotations import RawVideoContent, Dimensions
 
 
 # Video class
@@ -25,7 +26,7 @@ class PexelsVideo:
         video_pictures: A list of preview pictures as PexelsVideoPicture objects of the video.
     """
 
-    def __init__(self, json_content):
+    def __init__(self, json_content: RawVideoContent):
         """Constructor of the class.
 
         Args:
@@ -34,14 +35,14 @@ class PexelsVideo:
 
         # Initialization of all read-only attributes
         self._pexels_id = json_content["id"]
-        self._size = [json_content["width"], json_content["height"]]
+        self._size = (json_content["width"], json_content["height"])
         self._pexels_url = json_content["url"]
         self._screenshot_url = json_content["image"]
         self._duration = json_content["duration"]
         self._owner = PexelsUser(
-            json_content["user"]["id"],
             json_content["user"]["name"],
-            json_content["user"]["url"]
+            json_content["user"]["url"],
+            json_content["user"]["id"]
         )
 
         # Initialization continued; creation of lists with child classes
@@ -57,7 +58,7 @@ class PexelsVideo:
         return self._pexels_id
 
     @property
-    def size(self) -> list[int]:
+    def size(self) -> Dimensions:
         """A list containing the width and height of the video in pixels."""
         return self._size
 

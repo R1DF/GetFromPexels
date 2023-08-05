@@ -11,6 +11,10 @@ from .video import PexelsVideo
 from .collection import PexelsCollection
 
 
+# Type aliases
+PexelsContent = list[PexelsPhoto | PexelsVideo | PexelsCollection]  # unable to fit in type_annotations.py (circular import)
+
+
 # Class
 @dataclass
 class PexelsQueryResults:
@@ -32,7 +36,7 @@ class PexelsQueryResults:
 
     # Properties
     @property
-    def content(self) -> list[PexelsPhoto | PexelsVideo | PexelsCollection]:
+    def content(self) -> PexelsContent:
         """The list of photos/pictures/collections returned by the query."""
         return self._content
 
