@@ -1,3 +1,5 @@
+"""Module containing type hints to be imported by other modules in the package for more clear typing."""
+
 # Imports
 from typing import Literal, TypedDict
 
