@@ -43,8 +43,13 @@ class PexelsVideoFile:
         self._url = json_content["link"]
 
     # Methods
-    def download(self, path):  # Path includes file name
-        """Downloads the contents of the video to a given path."""
+    def download(self, path: str):
+        """Downloads the contents of the video to a given path.
+
+        :param path: The path to the file, with the filename included but the file extension excluded
+        :rtype path: str
+        """
+
         video_content = requests.get(self.url)
         with open(f"{path}.{self.file_extension}", "wb") as file:
             file.write(video_content.content)

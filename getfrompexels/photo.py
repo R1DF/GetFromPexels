@@ -7,6 +7,7 @@ Classes:
 # Imports
 from .user import PexelsUser
 from .type_annotations import RawPhotoContent, Dimensions
+from typing import Optional
 import requests
 
 
@@ -60,13 +61,15 @@ class PexelsPhoto:
         self._alt_text = json_content["alt"]
 
     # Methods
-    def download(self, path: str, size: str = "original"):   # Path includes file name.
+    def download(self, path: str, size: str = "original"):
         """Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they
         wish.
 
-        Args:
-            path: The path and the filename of the file that the photo will be saved as. The .JPG extension will be added by default.
-            size: The size of the photo that will be saved from the "links" property. Default is "original".
+        :param path: The path to the file that the photo will be saved as. Must include the filename, but not the file
+        extension
+        :type path: str
+        :param size: The size of the photo, which must be a key from the "links" property, defaults to "original"
+        :type size: str
         """
 
         image_content = requests.get(self.links[size])
@@ -106,7 +109,9 @@ class PexelsPhoto:
 
     @property
     def liked_by_user(self) -> bool | None:
-        """A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object. If the photo was returned from find_collection_contents() it is None as it doesn't appear to be returned properly when that method is called."""
+        """A boolean variable that states whether the photo is liked by the user whose API is being used for the
+        Session object. If the photo was returned from find_collection_contents() it is None as it doesn't appear
+        to be returned properly when that method is called."""
         return self._liked_by_user
 
     @property

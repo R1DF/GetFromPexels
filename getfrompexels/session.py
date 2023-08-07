@@ -85,9 +85,21 @@ def ensure_lower(*values):
     return list(map(lambda x: x.lower() if isinstance(x, str) else x, values))
 
 
-def check_query_arguments(query, orientation, size, color, locale):
+def check_query_arguments(query: str, orientation: Optional[str], size: Optional[str], color: Optional[str],
+                          locale: Optional[str]):
     """Checks and raises exceptions when arguments passed in a "search" function do not fit required criteria. This
     function is called inside another method. More information on the arguments can be seen in those functions.
+
+    :param query: The search query that was passed from the function that called this method
+    :rtype query: str
+    :param orientation: The orientation of the photo or video that was passed from the function that called this method
+    :rtype orientation: str, optional
+    :param size: The size of the photo or video that was passed from the function that called this method
+    :rtype size: str, optional
+    :param color: The color of the photo or video that was passed from the function that called this method
+    :rtype color: str, optional
+    :param locale: The locale of the search
+    :rtype locale: str, optional
 
     :raises PexelsSearchError: When a given argument does not fit its required criteria
     """
@@ -228,7 +240,8 @@ class PexelsSession:
         :param: photo_id: The ID of the photo
         :type: photo_id: int
 
-        :return: PexelsPhoto
+        :return: A PexelsPhoto object containing information about the photo given the ID
+        :rtype: PexelsPhoto
         """
 
         # Making request
@@ -246,7 +259,8 @@ class PexelsSession:
         :param video_id: The ID of the video
         :type video_id: int
 
-        :return: PexelsVideo
+        :return: A PexelsVideo object containing information about the video given the ID
+        :rtype: PexelsVideo
         """
 
         # Making request
@@ -268,6 +282,9 @@ class PexelsSession:
         :type per_page: int
 
         :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
+
+        :return: A PexelsQueryResults object containing all curated photos as PexelsPhoto objects
+        :rtype: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -320,7 +337,8 @@ class PexelsSession:
         :raises PexelsSearchError: When specific criteria aren't met, like max_duration being less than min_duration,
         or negative values being present for the first 5 arguments, or per_page being less than 1 or over 80
 
-        :return: PexelsQueryResults
+        :return: A PexelsQueryResults object containing popular videos on the website as PexelsVideo objects
+        :rtype: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -373,7 +391,8 @@ class PexelsSession:
         :param per_page: The number of collections that is being requested for the page. Maximum is 80, defaults to 15
         :type per_page: int
 
-        :return: PexelsQueryResults
+        :return: A PexelsQueryResults object containing collections featured on Pexels as PexelsCollection objects
+        :rtype: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -421,7 +440,9 @@ class PexelsSession:
 
         :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
 
-        :return: PexelsQueryResults
+        :return: A PexelsQueryResults object that contains PexelsCollection objects for each collection that the user
+        (the key of which is being used) owns
+        :rtype: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -480,7 +501,9 @@ class PexelsSession:
 
         :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
 
-        :return: PexelsQueryResults
+        :return: A PexelsQueryResults object that contains PexelsPhoto or PexelsVideo (or both) objects which give
+        information about media that are in the collection given by its ID
+        :rtype: PexelsQueryResults
         """
 
         # Checking specific argument validity
@@ -543,7 +566,9 @@ class PexelsSession:
 
         :raises PexelsSearchError: When page is less than 1 or per_page is less than 1 or over 80
 
-        :return: PexelsQueryResults
+        :return: A PexelsQueryResults object containing PexelsPhoto objects containing information about the photos that
+        were returned from the query
+        :rtype: PexelsQueryResults
         """
 
         # Checking argument validity
@@ -593,16 +618,24 @@ class PexelsSession:
         """Searches for videos given a specific query and some optional parameters and returns a PexelsQueryResults
         object with the videos that are returned.
 
-        Args:
-             query: The query that is being searched.
-             orientation: The selected orientation of the videos. Either "landscape", "portrait", or "square". Optional, if it's not given then videos of any orientation will show up.
-             size: The chosen size of the videos. Either "large" (4K), "medium" (Full HD), or "small" (HD). Optional, if it's not given then videos of any size will show up.
-             locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS. Optional, if it's not given then videos regardless of locale will show up.
-             page: The results page number that is being requested.
-             per_page: Amount of videos that will be returned in the page. Default is 15. Maximum is 80.
+         :param query: The query that is being searched
+         :type query: str
+         :param orientation: The selected orientation of the videos. Caan be "landscape", "portrait", or "square"
+         :type orientation: str, optional
+         :param size: The chosen size of the videos. Can be "large" (4K), "medium" (Full HD), or "small" (HD)
+         :rtype size: str, optional
+         :param locale: The locale of the performed search. Can be any option in SUPPORTED_LOCATIONS
+         :size locale: str, optional
+         :param page: The results page number that is being requested. Maximum is 80, defaults to 1
+         :type page: int
+         :param per_page: Amount of videos that will be returned in the page. Maximum is 80, defaults to 15
+         :type per_page: int
 
-        Raises:
-            PexelsSearchError: When the page number is a non-positive number, or per_page doesn't fit in the 1 <= per_page <= 80 range.
+        :raises PexelsSearchError: When the page number is lest han 1, or per_page is less than 1 or over 80
+
+        :return: A PexelsQueryResults object containing PexelsVideo objects containing information about the videos that
+        were returned from the query
+        :rtype: PexelsQueryResults
         """
 
         # Checking argument validity
@@ -640,15 +673,14 @@ class PexelsSession:
     def set_key(self, key: str):
         """Sets the key of the PexelsSession object or changes it if an old one is present.
 
-        Args:
-            key: The new key.
+        :param key: The new key that the PexelsSession instance will use when making requests with methods.
+        :type key: str
 
-        Raises:
-            TypeError: When the key argument is not a str object.
+        :raises TypeError: When the key argument is not a string
         """
 
         if not isinstance(key, str):
-            raise TypeError("key is not a string object")
+            raise TypeError("key is not of type str")
         self._key = key
 
     # Updating saved rate limit values
@@ -656,8 +688,8 @@ class PexelsSession:
         """Updates the request limit attributes given by the latest response's headers. This function gets called by
         another method.
 
-        Args:
-            response: The requests.Response object the headers of which will contain the latest request statistics.
+        :param response: The response object the headers of which will contain the latest request statistics
+        :type response: requests.Response
         """
 
         self._request_limit = response.headers["X-Ratelimit-Limit"]
