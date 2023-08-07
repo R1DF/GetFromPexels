@@ -1,8 +1,4 @@
-"""This small Python module contains the endpoints that are accessed by a PexelsSession object in an HTTPS request.
-
-Variables:
-    ENDPOINTS: A dictionary of all endpoints used by the PexelsSession class.
-"""
+"""Module storing used Pexels API endpoints as one dictionary (ENDPOINTS)."""
 
 ENDPOINTS = {
     "FIND_PHOTO": "https://api.pexels.com/v1/photos",
