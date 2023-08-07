@@ -1,40 +1,27 @@
-"""This Python module contains the PexelsPhoto class that holds information about a photo stored on Pexels.
-
-Classes:
-    PexelsPhoto: Class that contains information about a photo hosted on Pexels.
-"""
+"""Python module containing the PexelsPhoto class that holds information about a photo stored on Pexels."""
 
 # Imports
 from .user import PexelsUser
-from .type_annotations import RawPhotoContent, Dimensions
-from typing import Optional
+from .type_hints import RawPhotoContent, Dimensions
 import requests
 
 
 # Photo class
 class PexelsPhoto:
-    """Class that contains information about a photo hosted on Pexels.
+    """Class that contains information about a photo hosted on Pexels. PexelsPhoto objects contain properties that are
+    meant to be used, specifically to avoid modifying attributes which are not meant to be modified.
 
-    Attributes:
-        pexels_id: The ID of the photo.
-        size: A list containing the width and height of the photo in pixels.
-        pexels_url: The URL to the photo on Pexels.
-        average_color: The hex code of the average color of the photo.
-        photographer: PexelsUser object that contains information about the photographer.
-        links: A dictionary containing direct links to the image in varying sizes.
-        is_liked: A boolean variable that states whether the photo is liked by the user whose API is being used for the Session object. If the photo was returned from find_collection_contents() it is None as it doesn't appear to be returned properly when that method is called.
-        alt_text: Alt text for the image.
-
-    Methods:
-        download(self, path, size="original")
-        Downloads a JPG file of the image to a given path, allowing the user to pick a specific photo size if they wish.
+    :param json_content: The JSON response (represented as a dictionary) that the constructor will use to initialise
+    attributes
+    :type json_content: dict
+    :param hide_liked: Boolean that determines whether the PexelsPhoto object has a liked_by_user property, as it
+    may not be accurate depending on the PexelsSession method that returned the PexelsPhoto, setting the attribute (and
+    property) to None, defaults to False
+    :type hide_liked: bool
     """
 
     def __init__(self, json_content: RawPhotoContent, hide_liked: bool = False):
-        """Constructor of the class.
-
-        Args:
-            json_content: A dictionary containing data about the photo from a successful API request.
+        """Class constructor.
         """
 
         # Initialization of read-only attributes

@@ -1,36 +1,24 @@
-"""This Python module contains the PexelsVideo class that holds information about a video stored on Pexels.
-
-Classes:
-    PexelsVideo: The class that contains information about a video on Pexels.
-"""
+"""Module containing the PexelsVideo class that holds information about a video stored on Pexels."""
 
 # Imports
 from .user import PexelsUser
 from .video_file import PexelsVideoFile
 from .video_picture import PexelsVideoPicture
-from .type_annotations import RawVideoContent, Dimensions
+from .type_hints import RawVideoContent, Dimensions
 
 
 # Video class
 class PexelsVideo:
-    """The class that contains information about a video on Pexels.
+    """The class that contains information about a video on Pexels. PexelsVideo objects contain properties that are
+    meant to be used, specifically to avoid modifying attributes which are not meant to be modified.
 
-    Attributes:
-        pexels_id: The ID of the video.
-        size: A list containing the width and height of the video in pixels.
-        pexels_url: The URL to the video on Pexels.
-        screenshot_url: The URL to a screenshot of the video.
-        duration: Duration of the video in seconds.
-        owner: PexelsUser object that contains information about the video owner.
-        video_files: A list of video files as PexelsVideoFile objects of the video.
-        video_pictures: A list of preview pictures as PexelsVideoPicture objects of the video.
+    :param json_content: The JSON response (represented as a dictionary) that the constructor will use to initialise
+    attributes
+    :type json_content: dict
     """
 
     def __init__(self, json_content: RawVideoContent):
-        """Constructor of the class.
-
-        Args:
-            json_content: A dictionary containing data about the video from a successful API request.
+        """Class constructor.
         """
 
         # Initialization of all read-only attributes

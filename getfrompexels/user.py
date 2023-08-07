@@ -1,8 +1,4 @@
-"""This Python module contains the User dataclass.
-
-Classes:
-    PexelsUser: A dataclass containing information about a specific user.
-"""
+"""Module containing the PexelsUser dataclass."""
 
 # Imports
 from dataclasses import dataclass
@@ -11,13 +7,15 @@ from dataclasses import dataclass
 # User class
 @dataclass
 class PexelsUser:
-    """A dataclass containing information about a specific user.
+    """A dataclass containing information about a specific user. PexelsUser objects contain properties that are meant to
+    be used, specifically to avoid modifying attributes which are not meant to be modified.
 
-    Attributes:
-        name: The name of the user.
-        url: The URL of the user's profile.
-        pexels_id: The Pexels ID of the user.
-        username: The username of the user (with the @).
+    :param _name: The name of the user
+    :type _name: str
+    :param _url: The URL of the user's profile
+    :type _url: str
+    :param _pexels_id: The Pexels ID of the user
+    :type _pexels_id: int
     """
 
     _name: str

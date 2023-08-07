@@ -1,8 +1,4 @@
-"""This Python module contains the PexelsVideoPicture dataclass.
-
-Classes:
-    PexelsVideoPicture: The dataclass that contains information about a preview picture of a Pexels video.
-"""
+"""Module containing the PexelsVideoPicture dataclass."""
 
 # Imports
 from dataclasses import dataclass
@@ -11,12 +7,14 @@ from dataclasses import dataclass
 # Class
 @dataclass
 class PexelsVideoPicture:
-    """The dataclass that contains information about a preview picture of a Pexels video.
+    """The dataclass that contains information about a preview picture of a Pexels video. PexelsVideoPicture objects
+    contain properties that are meant to be used, specifically to avoid modifying attributes which are not meant to be
+    modified.
 
-    Attributes:
-        pexels_id: The ID of the preview picture.
-        picture_url: The URL of the preview picture.
-
+    :param _pexels_id: The ID of the preview picture
+    :type _pexels_id: int
+    :param _picture_url: The URL of the preview picture
+    :type _picture_url: str
     """
 
     _pexels_id: int

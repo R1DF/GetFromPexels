@@ -1,23 +1,4 @@
-"""Python module that contains the PexelsSession class and associated variables and functions.
-
-Classes:
-    PexelsSession: The main class that is used to communicate with the Pexels API.
-
-Functions:
-    ensure_lower(*values)
-    Returns a modified list of given values (*values) where all string members are in lowercase.
-
-    check_query_arguments(query, orientation, size, color, locale)
-    Checks and raises exceptions when arguments passed in a "search" function do not fit required criteria. This
-    function is called inside another method. More information on the arguments can be seen in those functions.
-
-    get_query_parameters(**parameters)
-    Returns an incomplete part of a URL for an endpoint with parameters for making requests with specific values.
-
-Variables:
-    SUPPORTED_PHOTO_COLORS: Tuple containing supported colors for Pexels photos.
-    SUPPORTED_LOCATIONS: Tuple containing supported locale values for Pexels photos and videos.
-"""
+"""Module containing the PexelsSession class with associated variables and functions outside the class."""
 
 # Imports
 from .exceptions import *
@@ -27,7 +8,7 @@ from .collection import PexelsCollection
 from .query_results import PexelsQueryResults
 from .endpoints import ENDPOINTS
 from .verifier import verify_response
-from .type_annotations import QueryMethod, CollectionMediaType, Orientation, Size
+from .type_hints import QueryMethod, CollectionMediaType, Orientation, Size
 from typing import Optional
 import requests
 import re
@@ -140,66 +121,18 @@ def get_query_parameters(**parameters):
 
 # Session class
 class PexelsSession:
-    """The main class that is used to call functions which deal with making requests to the Pexels API.
+    """The main class that is used to call methods which deal with making requests to the Pexels API. Contains request
+    statistics as properties of a PexelsSession object, all of which are set to None before a first request due to the
+    way the Pexels API works.
 
-    Attributes:
-        key: The API key used every time a request is made.
-        request_limit: The maximum amount of requests the user can make for the month.
-        requests_left: The amount of requests the user can make for until the limit resets.
-        requests_rollback_timestamp: The UNIX timestamp of the date when the monthly period rolls over.
-
-    Methods:
-        get_http_response(self, endpoint: str, origin_function_type: str | None = None) -> requests.Response
-        Returns a requests.Response object provided an endpoint.
-
-        find_photo(self, photo_id: int) -> PexelsPhoto
-        Returns a PexelsPhoto object depending on the given photo ID.
-
-        find_video(self, video_id: int) -> PexelsVideo
-        Returns a PexelsVideo object depending on the given video ID.
-
-        search_curated_photos(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
-        Returns a PexelsQueryResults object containing photos curated by the Pexels team.
-
-        search_popular_videos(self, min_width: int | None = None, min_height: int | None = None,
-        min_duration: int | None = None, max_duration: int | None = None, page: int = 1, per_page: int = 15) ->
-        PexelsQueryResults
-        Returns a PexelsQueryResults object containing popular videos.
-
-        search_featured_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
-        Returns PexelsQueryResults object containing featured collections.
-
-        find_user_collections(self, page: int = 1, per_page: int = 15) -> PexelsQueryResults
-        Returns PexelsQueryResults object containing collections that the user has.
-
-        find_collection_contents(self, collection_id: int, media_type: str | None = None, page: int = 1,
-        per_page: int = 15) -> PexelsQueryResults
-        Returns a PexelsQueryResults object containing media inside a collection given by ID.
-
-        search_for_photos(self, query: str, orientation: str | None = None, size: str | None = None,
-        color: str | None = None, locale: str | None = None, page: int = 1, per_page: int = 15) -> PexelsQueryResults
-        Searches and returns a PexelsQueryResults object containing photos given by a query.
-
-        search_for_videos(self, query: str, orientation: str | None = None, size: str | None = None,
-        locale: str | None = None, page: int = 1, per_page: int = 15) -> PexelsQueryResults
-        Searches and returns a PexelsQueryResults object containing videos given by a query.
-
-        set_key(self, key: str)
-        Sets the key of the PexelsSession object or changes it if an old one is present.
-
-        update_rate_limit_attributes(self, response: requests.Response)
-        Updates the request limit attributes given by the latest response's headers. This function gets called by
-        another method.
+    :param key: The API key used every time a request is made. While specifying the API key is not forced (optional),
+    must be specified before request methods get used, however, either by the set_key() method or with the constructor
+    :type key: str, optional
     """
 
     def __init__(self, key: str = None):
+        """Class constructor.
         """
-        Constructor of the PexelsSession object.
-
-        :param key: The API key used, if not provided then must be set later on in the code
-        :type key: str, optional
-        """
-
         # Initialisation
         if not (isinstance(key, str) or key is None):
             raise TypeError("key must either be not given/None or a str object")
@@ -225,7 +158,6 @@ class PexelsSession:
         :return: A Response object that was returned from the request made in the method call
         :rtype: requests.Response
         """
-
         if self._key is None:
             raise PexelsAuthorizationError("an API key must be provided for function call")
 
@@ -243,7 +175,6 @@ class PexelsSession:
         :return: A PexelsPhoto object containing information about the photo given the ID
         :rtype: PexelsPhoto
         """
-
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_PHOTO"]
         request_url = f"{targeted_endpoint}/{photo_id}"
@@ -262,7 +193,6 @@ class PexelsSession:
         :return: A PexelsVideo object containing information about the video given the ID
         :rtype: PexelsVideo
         """
-
         # Making request
         targeted_endpoint = ENDPOINTS["FIND_VIDEO"]
         request_url = f"{targeted_endpoint}/{video_id}"
@@ -286,7 +216,6 @@ class PexelsSession:
         :return: A PexelsQueryResults object containing all curated photos as PexelsPhoto objects
         :rtype: PexelsQueryResults
         """
-
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -340,7 +269,6 @@ class PexelsSession:
         :return: A PexelsQueryResults object containing popular videos on the website as PexelsVideo objects
         :rtype: PexelsQueryResults
         """
-
         # Checking specific argument validity
         if (max_duration is not None) and (min_duration is not None):
             if isinstance(max_duration, int) and isinstance(min_duration, int):
@@ -394,7 +322,6 @@ class PexelsSession:
         :return: A PexelsQueryResults object containing collections featured on Pexels as PexelsCollection objects
         :rtype: PexelsQueryResults
         """
-
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -444,7 +371,6 @@ class PexelsSession:
         (the key of which is being used) owns
         :rtype: PexelsQueryResults
         """
-
         # Checking specific argument validity
         if per_page > 80 or per_page < 1:
             raise PexelsSearchError("per_page parameter must be in between 1 and 80 inclusive")
@@ -505,7 +431,6 @@ class PexelsSession:
         information about media that are in the collection given by its ID
         :rtype: PexelsQueryResults
         """
-
         # Checking specific argument validity
         if media_type not in ["photos", "videos"]:
             media_type = None  # Done to remove from parameters section in request URL
@@ -570,7 +495,6 @@ class PexelsSession:
         were returned from the query
         :rtype: PexelsQueryResults
         """
-
         # Checking argument validity
         query = query.strip()
         check_query_arguments(query, orientation, size, color, locale)
@@ -620,7 +544,7 @@ class PexelsSession:
 
          :param query: The query that is being searched
          :type query: str
-         :param orientation: The selected orientation of the videos. Caan be "landscape", "portrait", or "square"
+         :param orientation: The selected orientation of the videos. Can be "landscape", "portrait", or "square"
          :type orientation: str, optional
          :param size: The chosen size of the videos. Can be "large" (4K), "medium" (Full HD), or "small" (HD)
          :rtype size: str, optional
@@ -637,7 +561,6 @@ class PexelsSession:
         were returned from the query
         :rtype: PexelsQueryResults
         """
-
         # Checking argument validity
         query = query.strip()
         check_query_arguments(query, orientation, size, None, locale)  # No such parameter as color for video
@@ -678,7 +601,6 @@ class PexelsSession:
 
         :raises TypeError: When the key argument is not a string
         """
-
         if not isinstance(key, str):
             raise TypeError("key is not of type str")
         self._key = key
@@ -691,7 +613,6 @@ class PexelsSession:
         :param response: The response object the headers of which will contain the latest request statistics
         :type response: requests.Response
         """
-
         self._request_limit = response.headers["X-Ratelimit-Limit"]
         self._requests_left = response.headers["X-Ratelimit-Remaining"]
         self._requests_rollback_timestamp = response.headers["X-Ratelimit-Reset"]

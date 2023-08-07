@@ -1,8 +1,4 @@
-"""This Python module contains the PexelsQueryResults dataclass.
-
-Classes:
-    PexelsQueryResults: The dataclass that contains the results of a query made by a PexelsSession object.
-"""
+"""Module containing the PexelsQueryResults dataclass."""
 
 # Imports
 from dataclasses import dataclass
@@ -12,20 +8,24 @@ from .collection import PexelsCollection
 
 
 # Type aliases
-PexelsContent = list[PexelsPhoto | PexelsVideo | PexelsCollection]  # unable to fit in type_annotations.py (circular import)
+PexelsContent = list[PexelsPhoto | PexelsVideo | PexelsCollection]  # unable to fit in type_hints.py (circular import)
 
 
 # Class
 @dataclass
 class PexelsQueryResults:
-    """The dataclass that contains the results of a query made by a PexelsSession object.
+    """Dataclass that contains the results of a query made by a PexelsSession object.
 
-    Attributes:
-        content: The list of photos/pictures/collections returned by the query.
-        url: The URL of the query.
-        total_results: The total amount of results received from the query.
-        page: The page number of the query.
-        per_page: The amount of content returned per page.
+    :param _content: A list that contains PexelsPhoto, PexelsVideo, or PexelsCollection objects. Can be mixed
+    :type _content: list
+    :param _url: The URl of the query
+    :type _url: str
+    :param _total_results: The total amount of media that was returned from the query
+    :type _total_results: int
+    :param _page: The page number of the query
+    :type _page: int
+    :param _per_page: The number of content returned per page
+    :type _per_page: int
     """
 
     _content: list
@@ -37,7 +37,7 @@ class PexelsQueryResults:
     # Properties
     @property
     def content(self) -> PexelsContent:
-        """The list of photos/pictures/collections returned by the query."""
+        """A list that contains PexelsPhoto, PexelsVideo, or PexelsCollection objects. Can be mixed."""
         return self._content
 
     @property

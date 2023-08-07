@@ -1,33 +1,26 @@
-"""Python module containing a specific function, defining it separated from other modules.
-
-Functions:
-    verify_response(response: requests.Response, origin_function_type: str | None = None)
-    Runs through a response and sees if it has returned a valid status code to raise an exception if it didn't.
-
-"""
+"""Module containing a function to verify a response object, separated from other modules."""
 
 # Getting exceptions
 from .exceptions import PexelsAuthorizationError, PexelsLookupError, PexelsAPIRequestError
-from .type_annotations import QueryMethod
+from .type_hints import QueryMethod
 from typing import Optional
 import requests
 
 
 # Response verifier (called by PexelsSession before it returns anything)
 def verify_response(response: requests.Response, origin_function_type: Optional[QueryMethod]):
-    """Runs through a response and sees if it has returned a valid status code to raise an exception if it didn't.
+    """Runs through a response to see if it has returned a valid status code, raising an exception if it didn't.
 
-    Args:
-        response: The requests.Response object that is to be run through.
-        origin_function_type: The type of the method that called this function. Optional.
+    :param response: The requests.Response object that is to be run through
+    :type response: requests.Response
+    :param origin_function_type: The type of the method that called this function
+    :type origin_function_type: str, optional
 
-    Raises:
-        PexelsAuthorizationError: Raised on HTTP Error 401 if the request returns an Unauthorized error, meaning there is no given API key.
-        PexelsLookupError: Raised if no media is found after a "find" function calls this method.
-        PexelsAPIRequestError: Raised if any other HTTP error is given due to a non-200 status code.
-
+    :raises PexelsAuthorizationError: On HTTP Error 401 if the request returns an Unauthorized error, meaning there is
+    no given API key
+    :raises PexelsLookupError: If no valid media is found after a "find" function calls this method
+    :raises PexelsAPIRequestError: If any other HTTP error is given due to a non-200 status code
     """
-
     status_code = response.status_code
 
     # Making sure the response is valid first

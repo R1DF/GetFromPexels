@@ -1,9 +1,4 @@
-"""This Python module contains the PexelsVideoPicture dataclass.
-
-Classes:
-    PexelsVideoFile: The class that contains data about a video file, of which there are many of, for one video
-    uploaded to Pexels.
-"""
+"""Module containing the PexelsVideoPicture dataclass."""
 
 # Imports
 import requests
@@ -12,28 +7,17 @@ import requests
 # Photo class
 class PexelsVideoFile:
     """The class that contains data about a video file, of which there are many of, for one video uploaded to Pexels.
+    PexelsVideoFile objects contain properties that are meant to be used, specifically to avoid modifying attributes
+    which are not meant to be modified.
 
-    Attributes:
-        pexels_id: The Pexels ID of the video file.
-        quality: The quality of the video file. Either "hd" or "sd".
-        file_type: The video format of the video file.
-        file_extension: The file extension of the video.
-        size: A list containing the width and height of the video in pixels.
-        fps: The number of FPS in the video file.
-        url: A URL to where the video is being stored.
-
-    Methods:
-        download(self, path)
-        Downloads the contents of the video to a given path.
+    :param json_content: The JSON response (represented as a dictionary) that the constructor will use to initialise
+    attributes
+    :type json_content: dict
     """
 
     def __init__(self, json_content: dict):
-        """Constructor of the class.
-
-        Args:
-            json_content: A dictionary containing data about the video file for a given video after a successful API request.
+        """Class constructor.
         """
-
         # Initialization of attributes
         self._pexels_id = json_content["id"]
         self._quality = json_content["quality"]
@@ -47,9 +31,8 @@ class PexelsVideoFile:
         """Downloads the contents of the video to a given path.
 
         :param path: The path to the file, with the filename included but the file extension excluded
-        :rtype path: str
+        :type path: str
         """
-
         video_content = requests.get(self.url)
         with open(f"{path}.{self.file_extension}", "wb") as file:
             file.write(video_content.content)
