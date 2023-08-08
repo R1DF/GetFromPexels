@@ -21,3 +21,8 @@ class PexelsAPIRequestError(Exception):
     """More in-detail error that is raised when an HTTP response has an invalid status code after a request goes
     through the verify_response function."""
     pass
+
+
+class PexelsLimitError(Exception):
+    """Error that is raised when a method will demand to make more requests than a session object has left."""
+    pass
