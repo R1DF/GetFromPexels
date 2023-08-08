@@ -11,6 +11,7 @@ Size = Literal["small", "medium", "large"]
 Dimensions = tuple[int, int]  # (width, height) both in px
 
 # Photo-specific type hints
+PhotoSize = Literal["original", "portrait", "landscape", "large", "large2x", "medium", "small", "tiny"]
 PhotoLinks = TypedDict("PhotoLinks", {
     "original": str,
     "portrait": str,
