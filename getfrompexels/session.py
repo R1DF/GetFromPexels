@@ -233,7 +233,7 @@ class PexelsSession:
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
             _content=[PexelsPhoto(x) for x in results["photos"]],
-            _url=targeted_endpoint,
+            _url=request_url,
             _total_results=results["total_results"],
             _page=results["page"],
             _per_page=results["per_page"]
@@ -291,21 +291,22 @@ class PexelsSession:
 
         # Making request
         targeted_endpoint = ENDPOINTS["POPULAR_VIDEOS"]
-        response = self.get_https_response(targeted_endpoint + get_query_parameters(
+        request_url = targeted_endpoint + get_query_parameters(
             min_width=min_width,
             min_height=min_height,
             min_duration=min_duration,
             max_duration=max_duration,
             page=page,
             per_page=per_page
-        ))
+        )
+        response = self.get_https_response(request_url)
         results = response.json()
 
         # Returning data and updating rate limit values
         self.update_rate_limit_attributes(response)
         return PexelsQueryResults(
             _content=[PexelsVideo(x) for x in results["videos"]],
-            _url=targeted_endpoint,
+            _url=request_url,
             _total_results=results["total_results"],
             _page=results["page"],
             _per_page=results["per_page"]
@@ -418,7 +419,8 @@ class PexelsSession:
 
         :param collection_id: The ID of the collection the contents of which are being requested
         :type collection_id: str
-        :param media_type: The ID of the collection the contents of which are being requested
+        :param media_type: A filter variable which determines if only photos or videos are going to be returned. If not
+        given, the filter will not apply and both media types will be included
         :type media_type: str, optional
         :param page: The results page number that is being requested, defaults to 1
         :type page: int The results page number that is being requested
