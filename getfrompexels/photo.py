@@ -37,7 +37,7 @@ class PexelsPhoto:
         self._links = {
             "original": json_content["src"]["original"],
             "large": json_content["src"]["large"],
-            "large_2x": json_content["src"]["large2x"],
+            "large2x": json_content["src"]["large2x"],
             "medium": json_content["src"]["medium"],
             "small": json_content["src"]["small"],
             "portrait": json_content["src"]["portrait"],
@@ -46,6 +46,7 @@ class PexelsPhoto:
         }
         self._liked_by_user = json_content["liked"] if not hide_liked else None
         self._alt_text = json_content["alt"]
+        self._content_type = "photo"
 
     # Methods
     def download(self, path: str, size: str = "original"):
@@ -105,3 +106,9 @@ class PexelsPhoto:
     def alt_text(self) -> str:
         """Alt text for the image."""
         return self._alt_text
+
+
+    @property
+    def content_type(self) -> str:
+        """Returns the type of media the object is, which is "photo" for this class."""
+        return self._content_type
