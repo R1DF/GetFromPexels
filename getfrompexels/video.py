@@ -38,6 +38,7 @@ class PexelsVideo:
         video_pictures = json_content["video_pictures"]
         self._video_files = [PexelsVideoFile(x) for x in video_files]
         self._video_pictures = [PexelsVideoPicture(x["id"], x["picture"]) for x in video_pictures]
+        self._content_type = "video"
 
     # Properties
     @property
@@ -79,3 +80,8 @@ class PexelsVideo:
     def video_pictures(self) -> list[PexelsVideoPicture]:
         """A list of preview pictures as PexelsVideoPicture objects of the video."""
         return self._video_pictures
+
+    @property
+    def content_type(self) -> str:
+        """Returns the type of media the object is, which is "video" for this class."""
+        return self._content_type
