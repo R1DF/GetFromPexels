@@ -5,10 +5,12 @@ from dataclasses import dataclass
 from .photo import PexelsPhoto
 from .video import PexelsVideo
 from .collection import PexelsCollection
+from .type_hints import CollectionMediaType, PhotoSize
+from typing import Optional
 
 
 # Type aliases
-PexelsContent = list[PexelsPhoto | PexelsVideo | PexelsCollection]  # unable to fit in type_hints.py (circular import)
+PexelsContent = list[PexelsPhoto | PexelsVideo | PexelsCollection]
 
 
 # Class
@@ -33,6 +35,45 @@ class PexelsQueryResults:
     _total_results: int
     _page: int
     _per_page: int
+
+    # Methods
+    def download_content(self, path: str, media_type: Optional[CollectionMediaType] = None,
+                         name_prefix: Optional[str] = None, name_suffix: Optional[str] = None,
+                         desired_size_for_photo: PhotoSize = "original"):
+        """Downloads all content in the PexelsQueryResults object to a folder. Filtering and slight filename changes are
+        possible.
+
+        :param path: The path to the directory where each file will be downloaded to
+        :type path: str
+        :param media_type: The type of content from the query that is requested for download. Can be "photos" or "videos"
+        :type media_type: str, optional
+        :param name_prefix: If set, all content will be given a specific prefix in its filename before being followed by
+        its position in the content list. Otherwise, the filename of each file will just be its ID
+        :type name_prefix: str, optional
+        :param name_suffix: If set, all content will be given a specific suffix in its filename, which also depends on
+        file_prefix.
+        :type name_suffix: str, optional
+        :param desired_size_for_photo: The desired size to download of the photos in the content. Defaults to "original"
+        :type desired_size_for_photo: str
+        """
+        for index, media in enumerate(self.content):
+            match media.content_type:
+                case "photo":
+                    if media_type is None or media_type == "photos":
+                        if (name_prefix is None) and (name_suffix is None):
+                            filename = str(media.pexels_id)
+                        else:
+                            filename = f"{name_prefix if name_prefix is not None else ''}{index}{name_suffix if name_suffix is not None else ''}"
+                        media.download(path + filename, desired_size_for_photo)
+
+                case "video":
+                    # TODO: create param that allows user to choose what type of video file to save in later versions
+                    if media_type is None or media_type == "videos":
+                        if (name_prefix is None) and (name_suffix is None):
+                            filename = str(media.pexels_id)
+                        else:
+                            filename = f"{name_prefix if name_prefix is not None else ''}{index}{name_suffix if name_suffix is not None else ''}"
+                        media.video_files[0].download(path + filename)
 
     # Properties
     @property
