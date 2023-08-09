@@ -8,6 +8,7 @@ from .type_hints import CollectionMediaType, PhotoSize
 from .exceptions import PexelsLimitError
 from typing import Optional
 from math import ceil
+import os
 
 
 # Type aliases
@@ -107,7 +108,7 @@ class PexelsCollection:
                             filename = str(media.pexels_id)
                         else:
                             filename = f"{name_prefix if name_prefix is not None else ''}{index}{name_suffix if name_suffix is not None else ''}"
-                        media.download(path + filename, desired_size_for_photo)
+                        media.download(os.path.join(path, filename), desired_size_for_photo)
 
                 case "video":
                     # TODO: create param that allows user to choose what type of video file to save in later versions
@@ -116,7 +117,7 @@ class PexelsCollection:
                             filename = str(media.pexels_id)
                         else:
                             filename = f"{name_prefix if name_prefix is not None else ''}{index}{name_suffix if name_suffix is not None else ''}"
-                        media.video_files[0].download(path + filename)
+                        media.video_files[0].download(os.path.join(path, filename))
 
     # Properties
     @property
