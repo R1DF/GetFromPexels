@@ -41,10 +41,9 @@ photo.download(PATH, "large2x")  # Several sizes accepted
 ```
 
 ## Documentation
-The full documentation for the library is contained in the `/docs/` directory in the repository, offering more examples of code
-and in-detail descriptions of methods and classes. The code in the library itself is also documented, albeit to an unconvential style.
-FYI, for later versions, this library's code's documentation is planned to use the Sphinx style structure, making a ReadTheDocs
-style documentation available.
+As version 1.1.0 is in development, the docstrings in the code have all been fit to use the reStructuredText format, so
+that a comprehensive documentation would be offered on ReadTheDocs. There is a small amount of files in the `/docs/`
+directory that serve as a small introduction which will later be taken down when the documentation is complete.
 
 ## Additional Information
 **The library requires for the `requests` module to be installed.**<br>
