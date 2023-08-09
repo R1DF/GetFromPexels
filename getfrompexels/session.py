@@ -536,7 +536,7 @@ class PexelsSession:
             self,
             query: str,
             orientation: Optional[str] = None,
-            size: Optional[str] = None,
+            size: Optional[Size] = None,
             locale: Optional[str] = None,
             page=1,
             per_page=15
