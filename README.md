@@ -49,7 +49,7 @@ directory that serve as a small introduction which will later be taken down when
 **The library requires for the `requests` module to be installed.**<br>
 If it isn't, running `pip install requests` in the terminal should install the library.<br>
 
-The minimum Python version that can use this library is Python 3.10.<br>
+The earliest Python version that can use this library is Python 3.11.<br>
 
 To request an API key, you must make a Pexels account and get one from the official Pexels website.<br>
 The official documentation for the Pexels APi is https://www.pexels.com/api/documentation/, which contains information about endpoints
