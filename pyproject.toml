@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "getfrompexels"
-version = "1.0.1"
+version = "1.1.0"
 authors = [
-  { name="R1DF", email="kindacomputational@protonmail.com" },
+  { name="R1DF" },
 ]
 description = "A wrapper that allows easy interaction with the Pexels API for everyone"
 readme = "README.md"
