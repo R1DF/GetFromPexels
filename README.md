@@ -41,9 +41,7 @@ photo.download(PATH, "large2x")  # Several sizes accepted
 ```
 
 ## Documentation
-As version 1.1.0 is in development, the docstrings in the code have all been fit to use the reStructuredText format, so
-that a comprehensive documentation would be offered on ReadTheDocs. There is a small amount of files in the `/docs/`
-directory that serve as a small introduction which will later be taken down when the documentation is complete.
+All classes and functions contain docstrings using the reST format as code documentation.
 
 ## Additional Information
 **The library requires for the `requests` module to be installed.**<br>
